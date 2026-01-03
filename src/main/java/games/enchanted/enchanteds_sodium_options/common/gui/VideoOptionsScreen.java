@@ -1,11 +1,9 @@
 package games.enchanted.enchanteds_sodium_options.common.gui;
 
 import games.enchanted.enchanteds_sodium_options.common.Logging;
-import games.enchanted.enchanteds_sodium_options.common.gui.widget.option.EnumCyclerWidget;
-import games.enchanted.enchanteds_sodium_options.common.gui.widget.option.IntegerSliderWidget;
-import games.enchanted.enchanteds_sodium_options.common.gui.widget.option.OnOffWidget;
-import games.enchanted.enchanteds_sodium_options.common.gui.widget.option.OptionWidget;
+import games.enchanted.enchanteds_sodium_options.common.gui.widget.option.*;
 import games.enchanted.enchanteds_sodium_options.common.gui.widget.scroll.VideoOptionsList;
+import games.enchanted.enchanteds_sodium_options.common.mixin.accessor.sodium.OptionAccessor;
 import games.enchanted.enchanteds_sodium_options.common.util.ComponentUtil;
 import net.caffeinemc.mods.sodium.client.config.ConfigManager;
 import net.caffeinemc.mods.sodium.client.config.structure.*;
@@ -67,8 +65,15 @@ public class VideoOptionsScreen extends Screen {
 
         for (ModOptions options : modOptions) {
             var theme = options.theme();
+            VideoOptionsList.ModInfo modInfo = new VideoOptionsList.ModInfo(options.configId(), theme);
 
-            this.optionsList.addHeader(Component.literal(options.name()).withColor(theme.themeLighter));
+            this.optionsList.addModTitle(
+                Component.literal(options.name()).withColor(theme.themeLighter),
+                Component.literal("v" + options.version()).withColor(theme.themeDarker),
+                options.icon(),
+                options.iconMonochrome(),
+                modInfo
+            );
 
             var pages = options.pages();
 
@@ -77,12 +82,13 @@ public class VideoOptionsScreen extends Screen {
                     Component name, Consumer<Screen> currentScreenConsumer
                 )) {
                     this.optionsList.addBigOption(
-                        Button.builder(name, button -> currentScreenConsumer.accept(this)).build()
+                        Button.builder(name, button -> currentScreenConsumer.accept(this)).build(),
+                        modInfo
                     );
                 }
                 else if(page instanceof OptionPage optionPage) {
-                    this.optionsList.addHeader(page.name().copy().withColor(theme.theme));
-                    buildPageOptions(optionPage);
+                    this.optionsList.addHeader(page.name().copy().withColor(theme.theme), modInfo);
+                    buildPageOptions(optionPage, modInfo);
                 }
                 else {
                     Logging.warn("Unknown page type. Class: {}, Name: {}", page.getClass().getCanonicalName(), page.name().getString());
@@ -95,13 +101,13 @@ public class VideoOptionsScreen extends Screen {
         this.repositionElements();
     }
 
-    public void buildPageOptions(OptionPage page) {
+    public void buildPageOptions(OptionPage page, VideoOptionsList.ModInfo modInfo) {
         var groups = page.groups();
 
         for(OptionGroup group : groups) {
             var groupOptions = group.options();
             for (Option option : groupOptions) {
-                this.optionsList.addOption(buildOptionWidget(option));
+                this.optionsList.addOption(buildOptionWidget(option), modInfo);
             }
         }
     }
@@ -115,17 +121,22 @@ public class VideoOptionsScreen extends Screen {
             case IntegerOption integerOption -> {
                 widget = new IntegerSliderWidget(0, 0, integerOption);
             }
-            case ExternalButtonOption externalButtonOption -> {
-                widget = Button.builder(option.getName(), button -> externalButtonOption.getCurrentScreenConsumer().accept(this))
-                    .width(Button.DEFAULT_WIDTH)
-                    .build();
-            }
+//            case ExternalButtonOption externalButtonOption -> {
+//                widget = Button.builder(option.getName(), button -> externalButtonOption.getCurrentScreenConsumer().accept(this))
+//                    .width(Button.DEFAULT_WIDTH)
+//                    .build();
+//            }
             case EnumOption<?> enumOption -> {
                 widget = new EnumCyclerWidget<>(0, 0, enumOption);
             }
             default -> {
-                Logging.warn("Unknown option type. Class: {}, Name: {}", option.getClass().getCanonicalName(), option.getName());
-                return Button.builder(option.getName(), button -> {}).width(Button.DEFAULT_WIDTH).build();
+                Logging.warn(
+                    "Unknown option type. Class: {}, Name: {}, id: {}",
+                    option.getClass().getCanonicalName(),
+                    option.getName().getString(),
+                    ((OptionAccessor) option).enchanteds_sodium_options$getId()
+                );
+                return new UnknownOptionWidget(0, 0, option);
             }
         }
 

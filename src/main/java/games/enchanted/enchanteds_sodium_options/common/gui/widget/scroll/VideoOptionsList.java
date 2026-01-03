@@ -1,5 +1,6 @@
 package games.enchanted.enchanteds_sodium_options.common.gui.widget.scroll;
 
+import net.caffeinemc.mods.sodium.client.gui.ColorTheme;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -24,7 +25,7 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
     public static final int DEFAULT_CHILD_WIDTH = 150;
     public static final int ROW_WIDTH = 310;
 
-    @Nullable private Entry lastEntry = null;
+    @Nullable private OptionEntry lastEntry = null;
 
     public VideoOptionsList(int x, int y, int width, int height) {
         super(x, y, width, height);
@@ -36,29 +37,43 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
     }
 
 
-    public WidgetPosition addOption(AbstractWidget child) {
+    public WidgetPosition addOption(AbstractWidget child, ModInfo modInfo) {
         if(this.lastEntry != null && this.lastEntry instanceof OptionEntry optionEntry) {
             optionEntry.setSecondChild(child);
             this.lastEntry = null;
             return new WidgetPosition(this.children().size() - 1, true);
         }
         child.setWidth(DEFAULT_CHILD_WIDTH);
-        Entry entry = new OptionEntry(child);
+        OptionEntry entry = new OptionEntry(child, modInfo);
         this.lastEntry = entry;
         this.addChild(entry);
         return new WidgetPosition(this.children().size() - 1, false);
     }
 
-    public WidgetPosition addBigOption(AbstractWidget child) {
+    public WidgetPosition addBigOption(AbstractWidget child, ModInfo modInfo) {
         this.lastEntry = null;
         child.setWidth(ROW_WIDTH);
-        this.addChild(new OptionEntry(child));
+        this.addChild(new OptionEntry(child, modInfo));
         return new WidgetPosition(this.children().size() - 1, false);
     }
 
-    public void addHeader(Component header) {
+    public void addHeader(Component header, ModInfo modInfo) {
+        trySetLastInCategoryOnBottomEntry(modInfo);
         this.lastEntry = null;
-        this.addChild(new HeaderEntry(header));
+        this.addChild(new HeaderEntry(header, modInfo));
+    }
+
+    public void addModTitle(Component name, Component version, @Nullable Identifier icon, boolean monochromeIcon, ModInfo modInfo) {
+        trySetLastInCategoryOnBottomEntry(modInfo);
+        this.lastEntry = null;
+        this.addChild(new ModTitleEntry(name, version, icon, monochromeIcon, modInfo));
+    }
+
+    public void trySetLastInCategoryOnBottomEntry(ModInfo info) {
+        if(this.children().isEmpty()) return;
+        if(this.children().getLast() instanceof OptionEntry entry && !entry.id.equals(info.id())) {
+            entry.lastInCategory = true;
+        }
     }
 
 
@@ -136,6 +151,37 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
     }
 
     static abstract class Entry extends Child {
+        private static final int ACCENT_LEFT_OFFSET = 4;
+        private static final int ACCENT_TOPMOST_OFFSET = 5;
+        private static final int ACCENT_BOTTOMMOST_OFFSET = 4;
+
+        final int accentColour;
+        final String id;
+
+        Entry(ModInfo info) {
+            this.accentColour = info.theme().theme;
+            this.id = info.id();
+        }
+
+        @Override
+        public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
+            graphics.fill(
+                this.getContentX() - ACCENT_LEFT_OFFSET - 1,
+                this.accentTop(),
+                this.getContentX() - ACCENT_LEFT_OFFSET,
+                this.accentBottom(),
+                this.accentColour
+            );
+        }
+
+        protected int accentTop() {
+            return this.getY();
+        }
+
+        protected int accentBottom() {
+            return this.getY() + this.getHeight();
+        }
+
         @Override
         protected int height() {
             return DEFAULT_CHILD_HEIGHT;
@@ -145,8 +191,10 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
     static class OptionEntry extends Entry {
         final AbstractWidget child;
         @Nullable AbstractWidget secondChild;
+        boolean lastInCategory = false;
 
-        OptionEntry(AbstractWidget widget) {
+        OptionEntry(AbstractWidget widget, ModInfo info) {
+            super(info);
             setMargins(new Margin(0, 0));
             this.child = widget;
         }
@@ -157,6 +205,8 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
 
         @Override
         public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
+            super.renderContent(graphics, mouseX, mouseY, hovered, partialTick);
+
             this.child.setX(this.getContentX());
             this.child.setY(this.getContentYMiddle() - this.child.getHeight() / 2);
             this.child.render(graphics, mouseX, mouseY, partialTick);
@@ -165,6 +215,12 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
             this.secondChild.setX(this.getContentRight() - this.secondChild.getWidth());
             this.secondChild.setY(this.getContentYMiddle() - this.secondChild.getHeight() / 2);
             this.secondChild.render(graphics, mouseX, mouseY, partialTick);
+        }
+
+        @Override
+        protected int accentBottom() {
+            if(!this.lastInCategory) return super.accentBottom();
+            return super.accentBottom() - Entry.ACCENT_BOTTOMMOST_OFFSET;
         }
 
         @Override
@@ -187,12 +243,15 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
     }
 
     static class HeaderEntry extends Entry {
-        final Component header;
+        private static final Margin HEADER_MARGINS = new Margin(8, 0, 0, 0);
+
+        final Component title;
         final Font font = Minecraft.getInstance().font;
 
-        HeaderEntry(Component header) {
-            setMargins(new Margin(8, 0, 0, 0));
-            this.header = header;
+        HeaderEntry(Component header, ModInfo info) {
+            super(info);
+            setMargins(HEADER_MARGINS);
+            this.title = header;
         }
 
         @Override
@@ -202,7 +261,84 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
 
         @Override
         public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
-            graphics.drawString(this.font, this.header, this.getContentX(), this.getContentY(), -1);
+            super.renderContent(graphics, mouseX, mouseY, hovered, partialTick);
+
+            graphics.drawString(this.font, this.title, this.getContentX(), this.getContentY(), -1);
+        }
+
+        @Override
+        public List<? extends AbstractWidget> widgetChildren() {
+            return List.of();
+        }
+
+        @Override
+        public List<? extends NarratableEntry> narratableChildren() {
+            return List.of();
+        }
+
+        @Override
+        public List<? extends GuiEventListener> children() {
+            return List.of();
+        }
+    }
+
+    static class ModTitleEntry extends Entry {
+        final Component title;
+        final Font font = Minecraft.getInstance().font;
+        @Nullable final Identifier icon;
+        final Component version;
+        final boolean monochromeIcon;
+        final int iconColour;
+
+        ModTitleEntry(Component title, Component version, @Nullable Identifier icon, boolean monochromeIcon, ModInfo info) {
+            super(info);
+            setMargins(HeaderEntry.HEADER_MARGINS);
+            this.title = title;
+            this.icon = icon;
+            this.version = version;
+            this.monochromeIcon = monochromeIcon;
+            this.iconColour = info.theme().themeLighter;
+        }
+
+        @Override
+        protected int height() {
+            return this.font.lineHeight;
+        }
+
+        @Override
+        public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
+            super.renderContent(graphics, mouseX, mouseY, hovered, partialTick);
+
+            final int iconSize = this.icon == null ? 0 : (int) (this.font.lineHeight * 1.5);
+            final int gap = 3;
+
+            if(this.icon != null) {
+                graphics.blit(
+                    RenderPipelines.GUI_TEXTURED,
+                    this.icon,
+                    this.getContentX(),
+                    this.getContentY() - (iconSize / 4),
+                    0,
+                    0,
+                    iconSize,
+                    iconSize,
+                    iconSize,
+                    iconSize,
+                    iconSize,
+                    iconSize,
+                    this.monochromeIcon ? this.iconColour : -1
+                );
+            }
+
+            graphics.drawString(this.font, this.title, this.getContentX() + iconSize + gap, this.getContentY(), -1);
+
+            int versionWidth = this.font.width(this.version);
+            graphics.drawString(this.font, this.version, this.getContentRight() - versionWidth, this.getContentY(), -1);
+        }
+
+        @Override
+        protected int accentTop() {
+            return super.accentTop() + Entry.ACCENT_TOPMOST_OFFSET;
         }
 
         @Override
@@ -222,5 +358,8 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
     }
 
     public record WidgetPosition(int entryIndex, boolean secondary) {
+    }
+
+    public record ModInfo(String id, ColorTheme theme) {
     }
 }

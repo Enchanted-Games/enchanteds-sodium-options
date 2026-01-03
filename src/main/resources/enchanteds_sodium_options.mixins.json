@@ -4,6 +4,7 @@
   "package": "games.enchanted.enchanteds_sodium_options.common.mixin",
   "compatibilityLevel": "JAVA_${java_ver}",
   "mixins": [
+    "accessor.sodium.OptionAccessor"
   ],
   "client": [
     "AbstractSliderButtonMixin",
