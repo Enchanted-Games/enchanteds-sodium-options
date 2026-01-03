@@ -11,15 +11,18 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
 import net.minecraft.util.Mth;
+import org.jspecify.annotations.Nullable;
 
 public class IntegerSliderWidget extends AbstractSliderButton implements AbstractSliderButtonExtension, OptionWidget<IntegerOption> {
     final IntegerOption option;
     int realValue;
 
-    public IntegerSliderWidget(int x, int y, IntegerOption integerOption) {
-        super(x, y, Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, integerOption.getName(), 0);
-        this.setTooltip(Tooltip.create(ComponentUtil.createOptionTooltip(integerOption)));
-        this.option = integerOption;
+    @Nullable OnChange onChange = null;
+
+    public IntegerSliderWidget(int x, int y, IntegerOption option) {
+        super(x, y, Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, option.getName(), 0);
+        this.setTooltip(Tooltip.create(ComponentUtil.createOptionTooltip(option)));
+        this.option = option;
         this.setValue(this.getSliderValue());
         this.updateMessage();
     }
@@ -40,12 +43,17 @@ public class IntegerSliderWidget extends AbstractSliderButton implements Abstrac
     @Override
     protected void applyValue() {
         this.realValue = getOptionValue();
+        this.option.modifyValue(this.realValue);
     }
 
     @Override
     protected void setValue(double value) {
         super.setValue(value);
         this.realValue = getOptionValue();
+        this.option.modifyValue(this.realValue);
+        if(this.onChange != null) {
+            this.onChange.changed();
+        }
         this.updateMessage();
     }
 
@@ -73,8 +81,24 @@ public class IntegerSliderWidget extends AbstractSliderButton implements Abstrac
         return Identifier.withDefaultNamespace("widget/slider");
     }
 
+
     @Override
     public IntegerOption getOption() {
         return this.option;
+    }
+
+    @Override
+    public void refreshValue() {
+        this.setValue(getSliderValue(this.option.getAppliedValue()));
+    }
+
+    @Override
+    public void onChange(OnChange changeCallback) {
+        this.onChange = changeCallback;
+    }
+
+    @Override
+    public void refreshVisual() {
+        this.updateMessage();
     }
 }
