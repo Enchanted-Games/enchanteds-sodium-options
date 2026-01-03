@@ -30,10 +30,12 @@ public class OnOffWidget extends Button implements OptionWidget<BooleanOption> {
     }
 
     protected void updateMessage() {
-        this.message = CommonComponents.optionNameValue(
+        this.message = ComponentUtil.optionMessage(
             this.option.getName(),
-            this.value ? CommonComponents.OPTION_ON : CommonComponents.OPTION_OFF
-        ).withColor(this.isActive() ? -1 : CommonColors.LIGHT_GRAY);
+            this.value ? CommonComponents.OPTION_ON : CommonComponents.OPTION_OFF,
+            this.isActive(),
+            this.option.hasChanged()
+        );
     }
 
     @Override

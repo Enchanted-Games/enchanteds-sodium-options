@@ -7,9 +7,8 @@ import net.caffeinemc.mods.sodium.client.config.structure.IntegerOption;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.CommonColors;
 import net.minecraft.util.Mth;
 import org.jspecify.annotations.Nullable;
 
@@ -34,10 +33,12 @@ public class IntegerSliderWidget extends AbstractSliderButton implements Abstrac
 
     @Override
     protected void updateMessage() {
-        this.message = CommonComponents.optionNameValue(
+        this.message = ComponentUtil.optionMessage(
             this.option.getName(),
-            this.option.formatValue(this.realValue)
-        ).withColor(this.isActive() ? -1 : CommonColors.LIGHT_GRAY);
+            this.option.formatValue(this.realValue),
+            this.isActive(),
+            this.option.hasChanged()
+        );
     }
 
     @Override
@@ -74,6 +75,12 @@ public class IntegerSliderWidget extends AbstractSliderButton implements Abstrac
         int max = validator.max();
         int step = validator.step();
         return min + step * (int) Math.round(this.value * (max - min) / step);
+    }
+
+    @Override
+    public void onRelease(MouseButtonEvent event) {
+        super.onRelease(event);
+        this.value = getSliderValue(this.realValue);
     }
 
     @Override

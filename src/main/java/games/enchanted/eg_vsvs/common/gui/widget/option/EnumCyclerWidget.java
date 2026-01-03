@@ -32,10 +32,12 @@ public class EnumCyclerWidget<T extends Enum<T>> extends Button implements Optio
     }
 
     protected void updateMessage() {
-        this.message = CommonComponents.optionNameValue(
+        this.message = ComponentUtil.optionMessage(
             this.option.getName(),
-            this.option.getElementName(this.value)
-        ).withColor(this.isActive() ? -1 : CommonColors.LIGHT_GRAY);
+            this.option.getElementName(this.value),
+            this.isActive(),
+            this.option.hasChanged()
+        );
     }
 
     @Override

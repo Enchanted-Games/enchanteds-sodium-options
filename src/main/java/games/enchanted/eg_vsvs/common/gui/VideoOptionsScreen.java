@@ -131,7 +131,7 @@ public class VideoOptionsScreen extends Screen {
 
     @Override
     public boolean shouldCloseOnEsc() {
-        return ConfigManager.CONFIG.anyOptionChanged();
+        return !ConfigManager.CONFIG.anyOptionChanged();
     }
 
     private void undoChanges() {
