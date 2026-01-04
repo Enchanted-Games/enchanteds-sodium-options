@@ -3,17 +3,23 @@
 
   "gui.enchanted_sodium_options.group.visual": "Visual",
   "gui.enchanted_sodium_options.option.accent_bars": "Accent Color Bars",
-  "gui.enchanted_sodium_options.option.accent_bars.tooltip": "When enabled, a colored bar will be displayed to the left of the options for each mod",
+  "gui.enchanted_sodium_options.option.accent_bars.tooltip": "When enabled, a colored bar will be displayed to the left of the options for each mod.",
   "gui.enchanted_sodium_options.option.show_mod_icons": "Show Mod Icons",
-  "gui.enchanted_sodium_options.option.show_mod_icons.tooltip": "Show mod icons in the config screen",
+  "gui.enchanted_sodium_options.option.show_mod_icons.tooltip": "Whether mod icons should be shown in the config screen.",
   "gui.enchanted_sodium_options.option.coloured_header_text": "Colored Mod Titles",
-  "gui.enchanted_sodium_options.option.coloured_header_text.tooltip": "When enabled, mod accent colors will be used for mod titles in the config screen",
+  "gui.enchanted_sodium_options.option.coloured_header_text.tooltip": "When enabled, mod accent colors will be used for mod titles in the config screen.",
   "gui.enchanted_sodium_options.option.coloured_category_text": "Colored Category Titles",
-  "gui.enchanted_sodium_options.option.coloured_category_text.tooltip": "When enabled, mod accent colors will be used for config category titles",
+  "gui.enchanted_sodium_options.option.coloured_category_text.tooltip": "When enabled, mod accent colors will be used for config category titles.",
+
+  "gui.enchanted_sodium_options.group.behaviour": "Behaviour",
+  "gui.enchanted_sodium_options.option.collapse_threshold": "Collapse Threshold",
+  "gui.enchanted_sodium_options.option.collapse_threshold.tooltip": "The maximum amount of options a config category can have before its contents are collapsed into a sub-menu.\nThis does not apply until you close and re-open the video settings screen.",
+  "gui.enchanted_sodium_options.option.collapse_sodium_options": "Collapse Sodium Options",
+  "gui.enchanted_sodium_options.option.collapse_sodium_options.tooltip": "Whether Sodium's options be collapsed into a submenu if the collapse threshold is met.\nThis does not apply until you close and re-open the video settings screen.",
 
   "gui.enchanted_sodium_options.unknown_option": "Unknown: %s",
   "gui.enchanted_sodium_options.unknown_option.tooltip.1": "Report this to Enchanted's Sodium Options!! Do not report this issue to Sodium, %s, or any other mod!",
   "gui.enchanted_sodium_options.unknown_option.tooltip.2": "Option '%s' could not be displayed by Enchanted's Sodium Options.\nOption type: '%s'",
-  
+
   "gui.enchanted_sodium_options.ellipsis": "%s..."
 }

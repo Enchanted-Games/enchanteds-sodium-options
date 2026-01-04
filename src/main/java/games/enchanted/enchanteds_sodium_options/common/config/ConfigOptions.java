@@ -7,6 +7,8 @@ import games.enchanted.enchanteds_sodium_options.common.ModConstants;
 import games.enchanted.enchanteds_sodium_options.common.PlatformHelper;
 import games.enchanted.enchanteds_sodium_options.common.config.option.BoolOption;
 import games.enchanted.enchanteds_sodium_options.common.config.option.ConfigOption;
+import games.enchanted.enchanteds_sodium_options.common.config.option.IntOption;
+import net.caffeinemc.mods.sodium.api.config.option.Range;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -39,6 +41,21 @@ public class ConfigOptions {
         true,
         "coloured_category_text"
     ));
+
+    // behaviour
+    public static final ConfigOption<Integer> COLLAPSE_THRESHOLD = registerOption(new IntOption(
+        6,
+        6,
+        new Range(1, 48, 1),
+        "collapse_threshold"
+    ));
+
+    public static final ConfigOption<Boolean> COLLAPSE_SODIUM_OPTIONS = registerOption(new BoolOption(
+        false,
+        false,
+        "collapse_sodium_options"
+    ));
+
 
     static {
         readConfig();

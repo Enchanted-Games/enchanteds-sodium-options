@@ -28,7 +28,15 @@ public class SodiumConfigEntry implements ConfigEntryPoint {
                     ConfigOptions.COLOURED_HEADER_TEXT,
                     ConfigOptions.COLOURED_CATEGORY_TEXT
                 )))
-            );
+            )
+            .addPage(builder.createOptionPage()
+                .setName(Component.translatable("gui.enchanted_sodium_options.group.behaviour"))
+                .addOptionGroup(createGroup(builder, List.of(
+                    ConfigOptions.COLLAPSE_THRESHOLD,
+                    ConfigOptions.COLLAPSE_SODIUM_OPTIONS
+                )))
+            )
+        ;
     }
 
     private static OptionGroupBuilder createGroup(ConfigBuilder builder, List<ConfigOption<?>> options) {

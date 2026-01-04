@@ -3,6 +3,8 @@ package games.enchanted.enchanteds_sodium_options.common.gui.screen;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.InputConstants;
 import games.enchanted.enchanteds_sodium_options.common.Logging;
+import games.enchanted.enchanteds_sodium_options.common.config.ConfigOptions;
+import games.enchanted.enchanteds_sodium_options.common.config.option.ConfigOption;
 import games.enchanted.enchanteds_sodium_options.common.gui.widget.option.*;
 import games.enchanted.enchanteds_sodium_options.common.gui.widget.scroll.VideoOptionsList;
 import games.enchanted.enchanteds_sodium_options.common.mixin.accessor.sodium.OptionAccessor;
@@ -157,7 +159,9 @@ public class VideoOptionsScreen extends Screen {
         AtomicInteger totalOptions = new AtomicInteger();
         page.groups().forEach(optionGroup -> totalOptions.addAndGet(optionGroup.options().size()));
 
-        if(totalOptions.get() > 6 && !modInfo.id().equals("sodium")) {
+        final boolean shouldCollapseThisPage = modInfo.id().equals("sodium") ? ConfigOptions.COLLAPSE_SODIUM_OPTIONS.getValue() : true;
+
+        if(totalOptions.get() > ConfigOptions.COLLAPSE_THRESHOLD.getValue() && shouldCollapseThisPage) {
             this.optionsList.addBigOption(
                 Button.builder(ComponentUtil.appendEllipsis(page.name()), button -> {
                     this.minecraft.setScreen(new SubVideoOptionsScreen(page, this, modInfo));
