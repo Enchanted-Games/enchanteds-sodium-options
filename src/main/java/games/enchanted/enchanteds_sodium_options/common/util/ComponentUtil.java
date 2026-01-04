@@ -1,6 +1,7 @@
 package games.enchanted.enchanteds_sodium_options.common.util;
 
 import net.caffeinemc.mods.sodium.client.config.structure.Option;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
@@ -14,8 +15,10 @@ public class ComponentUtil {
 
     public static Component createOptionTooltip(Option option) {
         if(option.getImpact() == null) return option.getTooltip();
-        // TODO: translations
-        return option.getTooltip().copy().append("\n\n").append(Component.literal("Performance impact ")).append(option.getImpact().getName());
+        return option.getTooltip().copy().append("\n\n")
+            .append(Component.translatable("sodium.options.performance_impact_string", option.getImpact().getName())
+                .withStyle(ChatFormatting.GRAY)
+            );
     }
 
     public static Component optionMessage(Component optionName, Component value, boolean active, boolean modified) {

@@ -115,7 +115,6 @@ public class VideoOptionsScreen extends Screen {
     public void buildPageOptions(OptionPage page, VideoOptionsList.ModInfo modInfo) {
         var groups = page.groups();
 
-        // TODO: display group names
         for(OptionGroup group : groups) {
             if(group.name() != null) {
                 this.optionsList.addGroupName(group.name(), modInfo);
@@ -161,7 +160,7 @@ public class VideoOptionsScreen extends Screen {
         }
         this.optionsList.visitChildren(widget -> {
             if(!(widget instanceof OptionWidget<?> optionWidget)) return;
-            optionWidget.onChange(this::optionChanged);
+            optionWidget.onChange(this::anyOptionChanged);
             this.optionWidgets.add(optionWidget);
         });
     }
@@ -191,7 +190,7 @@ public class VideoOptionsScreen extends Screen {
         this.updateFooterButtonState();
     }
 
-    private void optionChanged() {
+    private void anyOptionChanged() {
         updateFooterButtonState();
         this.optionWidgets.forEach(OptionWidget::refreshVisual);
     }
