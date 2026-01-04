@@ -22,7 +22,7 @@ public class SodiumConfigEntry implements ConfigEntryPoint {
             .setColorTheme(builder.createColorTheme().setBaseThemeRGB(ACCENT_COLOUR))
             .addPage(builder.createOptionPage()
                 .setName(Component.translatable("gui.enchanted_sodium_options.group.visual"))
-                .addOptionGroup(createBooleansGroup(builder, List.of(
+                .addOptionGroup(createGroup(builder, List.of(
                     ConfigOptions.ACCENT_BARS,
                     ConfigOptions.SHOW_MOD_ICONS,
                     ConfigOptions.COLOURED_HEADER_TEXT,
@@ -31,7 +31,7 @@ public class SodiumConfigEntry implements ConfigEntryPoint {
             );
     }
 
-    private static OptionGroupBuilder createBooleansGroup(ConfigBuilder builder, List<ConfigOption<?>> options) {
+    private static OptionGroupBuilder createGroup(ConfigBuilder builder, List<ConfigOption<?>> options) {
         var group = builder.createOptionGroup();
         for (ConfigOption<?> option : options) {
             group.addOption(option.createSodiumOption(builder, group));

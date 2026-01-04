@@ -1,7 +1,6 @@
 package games.enchanted.enchanteds_sodium_options.common.gui.widget.scroll;
 
 import games.enchanted.enchanteds_sodium_options.common.config.ConfigOptions;
-import games.enchanted.enchanteds_sodium_options.common.config.option.ConfigOption;
 import net.caffeinemc.mods.sodium.client.gui.ColorTheme;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -9,7 +8,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
-import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -62,16 +60,22 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
         return new WidgetPosition(this.children().size() - 1, false);
     }
 
-    public void addHeader(Component header, ModInfo modInfo) {
-        trySetLastInCategoryOnBottomEntry(modInfo);
-        this.lastEntry = null;
-        this.addChild(new HeaderEntry(header, modInfo));
-    }
-
     public void addModTitle(Component name, Component version, @Nullable Identifier icon, boolean monochromeIcon, ModInfo modInfo) {
         trySetLastInCategoryOnBottomEntry(modInfo);
         this.lastEntry = null;
         this.addChild(new ModTitleEntry(name, version, icon, monochromeIcon, modInfo));
+    }
+
+    public void addCategoryHeader(Component header, ModInfo modInfo) {
+        trySetLastInCategoryOnBottomEntry(modInfo);
+        this.lastEntry = null;
+        this.addChild(new CategoryHeaderEntry(header, modInfo));
+    }
+
+    public void addGroupName(Component header, ModInfo modInfo) {
+        trySetLastInCategoryOnBottomEntry(modInfo);
+        this.lastEntry = null;
+        this.addChild(new GroupTitleEntry(header, modInfo));
     }
 
     public void trySetLastInCategoryOnBottomEntry(ModInfo info) {
@@ -176,9 +180,9 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
         public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
             if(!ConfigOptions.ACCENT_BARS.getValue()) return;
             graphics.fill(
-                this.getContentX() - ACCENT_LEFT_OFFSET - 1,
+                this.getX() - ACCENT_LEFT_OFFSET - 1,
                 this.accentTop(),
-                this.getContentX() - ACCENT_LEFT_OFFSET,
+                this.getX() - ACCENT_LEFT_OFFSET,
                 this.accentBottom(),
                 this.accentColour
             );
@@ -280,19 +284,27 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
         }
     }
 
-    static class HeaderEntry extends Entry {
-        private static final Margin HEADER_MARGINS = new Margin(8, 0, 0, 0);
+    static class CategoryHeaderEntry extends Entry {
         private static final int LEFT_TEXT_OFFSET = 1;
+        private static final Margin HEADER_MARGINS = new Margin(8, 0, LEFT_TEXT_OFFSET, 0);
 
         final Font font = Minecraft.getInstance().font;
         final Component title;
-        final int titleColour;
+        final int textColour;
 
-        HeaderEntry(Component header, ModInfo info) {
+        CategoryHeaderEntry(Component header, ModInfo info) {
+            this(header, info, info.theme().theme);
+        }
+
+        CategoryHeaderEntry(Component header, ModInfo info, int textColour) {
             super(info);
             setMargins(HEADER_MARGINS);
             this.title = header;
-            this.titleColour = info.theme().theme;
+            this.textColour = textColour;
+        }
+
+        protected int getTextColour() {
+            return ConfigOptions.COLOURED_CATEGORY_TEXT.getValue() ? this.textColour : CommonColors.TEXT_GRAY;
         }
 
         @Override
@@ -307,10 +319,35 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
             graphics.drawString(
                 this.font,
                 this.title,
-                this.getContentX() + LEFT_TEXT_OFFSET,
+                this.getContentX(),
                 this.getContentY(),
-                ConfigOptions.COLOURED_CATEGORY_TEXT.getValue() ? this.titleColour : CommonColors.LIGHTER_GRAY
+                this.getTextColour()
             );
+        }
+    }
+
+    static class GroupTitleEntry extends CategoryHeaderEntry {
+        GroupTitleEntry(Component header, ModInfo info) {
+            super(header, info, CommonColors.TEXT_GRAY);
+            setMargins(new Margin(4, 0, 14, 0));
+        }
+
+        @Override
+        public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
+            super.renderContent(graphics, mouseX, mouseY, hovered, partialTick);
+
+            graphics.drawString(
+                this.font,
+                "-",
+                this.getContentX() - this.font.width("- "),
+                this.getContentY(),
+                this.getTextColour()
+            );
+        }
+
+        @Override
+        protected int getTextColour() {
+            return CommonColors.LIGHTER_GRAY;
         }
     }
 
@@ -326,7 +363,7 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
 
         ModTitleEntry(Component title, Component version, @Nullable Identifier icon, boolean monochromeIcon, ModInfo info) {
             super(info);
-            setMargins(HeaderEntry.HEADER_MARGINS);
+            setMargins(CategoryHeaderEntry.HEADER_MARGINS);
             this.title = title;
             this.icon = icon;
             this.version = version;
@@ -347,7 +384,7 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
             final boolean hasIcon = this.icon != null && ConfigOptions.SHOW_MOD_ICONS.getValue();
 
             final int iconSize = hasIcon ? (int) (this.font.lineHeight * 1.5) : 0;
-            final int gap = hasIcon ? 3 : HeaderEntry.LEFT_TEXT_OFFSET;
+            final int gap = hasIcon ? 3 : CategoryHeaderEntry.LEFT_TEXT_OFFSET;
 
             if(hasIcon) {
                 graphics.blit(

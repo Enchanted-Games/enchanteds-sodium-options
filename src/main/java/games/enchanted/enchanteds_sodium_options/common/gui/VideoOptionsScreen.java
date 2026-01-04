@@ -96,7 +96,7 @@ public class VideoOptionsScreen extends Screen {
                     );
                 }
                 else if(page instanceof OptionPage optionPage) {
-                    this.optionsList.addHeader(page.name(), modInfo);
+                    this.optionsList.addCategoryHeader(page.name(), modInfo);
                     buildPageOptions(optionPage, modInfo);
                 }
                 else {
@@ -117,6 +117,9 @@ public class VideoOptionsScreen extends Screen {
 
         // TODO: display group names
         for(OptionGroup group : groups) {
+            if(group.name() != null) {
+                this.optionsList.addGroupName(group.name(), modInfo);
+            }
             var groupOptions = group.options();
             for (Option option : groupOptions) {
                 this.optionsList.addOption(buildOptionWidget(option), modInfo);
