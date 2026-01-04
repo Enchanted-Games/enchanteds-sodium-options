@@ -14,12 +14,15 @@ import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Util;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
 public class VideoOptionsScreen extends Screen {
+    private static final Component TITLE = Component.translatable("options.videoTitle");
+    private static final Component DONATION_BUTTON_TEXT = Component.translatable("sodium.options.buttons.donate");
     private static final int FOOTER_BUTTON_WIDTH = 98;
 
     public final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
@@ -28,17 +31,24 @@ public class VideoOptionsScreen extends Screen {
     AbstractWidget undoButton;
     AbstractWidget applyButton;
     AbstractWidget doneButton;
+    AbstractWidget donateButton;
 
     final ArrayList<OptionWidget<?>> optionWidgets = new ArrayList<>();
 
-    public VideoOptionsScreen(Screen parent, Component title) {
-        super(title);
+    public VideoOptionsScreen(Screen parent) {
+        super(TITLE);
         this.parent = parent;
     }
 
     @Override
     protected void init() {
         this.layout.addTitleHeader(this.title, this.font);
+        int headerHeight = this.layout.getHeaderHeight();
+
+        this.donateButton = Button.builder(DONATION_BUTTON_TEXT, button -> {
+            Util.getPlatform().openUri("https://caffeinemc.net/donate");
+        }).width(FOOTER_BUTTON_WIDTH).build();
+        this.addRenderableWidget(this.donateButton);
 
         LinearLayout footerLayout = this.layout.addToFooter(LinearLayout.horizontal().spacing(8));
         this.undoButton = footerLayout.addChild(
@@ -50,9 +60,7 @@ public class VideoOptionsScreen extends Screen {
         this.doneButton = footerLayout.addChild(
             Button.builder(CommonComponents.GUI_DONE, button -> this.onClose()).width(FOOTER_BUTTON_WIDTH).build()
         );
-        this.layout.visitWidgets(this::addRenderableWidget);
 
-        int headerHeight = this.layout.getHeaderHeight();
         this.optionsList = new VideoOptionsList(
             0,
             headerHeight,
@@ -60,6 +68,7 @@ public class VideoOptionsScreen extends Screen {
             this.height - headerHeight - this.layout.getFooterHeight()
         );
         this.addRenderableWidget(this.optionsList);
+
 
         List<ModOptions> modOptions = ConfigManager.CONFIG.getModOptions();
 
@@ -97,6 +106,8 @@ public class VideoOptionsScreen extends Screen {
         }
 
         this.visitOptionsAndAddListeners();
+        this.layout.visitWidgets(this::addRenderableWidget);
+
         this.updateFooterButtonState();
         this.repositionElements();
     }
@@ -203,8 +214,13 @@ public class VideoOptionsScreen extends Screen {
     @Override
     protected void repositionElements() {
         this.layout.arrangeElements();
+        int headerHeight = this.layout.getHeaderHeight();
+        this.donateButton.setPosition(
+            this.width - this.donateButton.getWidth() - 8,
+            (headerHeight / 2) - this.donateButton.getHeight() / 2
+        );
+
         if(optionsList != null) {
-            int headerHeight = this.layout.getHeaderHeight();
             this.optionsList.setRectangle(
                 this.width,
                 this.height - headerHeight - this.layout.getFooterHeight(),

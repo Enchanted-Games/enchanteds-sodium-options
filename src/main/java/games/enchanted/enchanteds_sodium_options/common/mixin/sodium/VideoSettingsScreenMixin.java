@@ -29,7 +29,7 @@ public class VideoSettingsScreenMixin extends Screen {
     )
     private void afterScreenInit(CallbackInfo info) {
         if(!InputUtil.shouldShowDebugWidgetBound()) {
-            Minecraft.getInstance().setScreen(new VideoOptionsScreen(prevScreen, title));
+            Minecraft.getInstance().setScreen(new VideoOptionsScreen(prevScreen));
         }
     }
 }
