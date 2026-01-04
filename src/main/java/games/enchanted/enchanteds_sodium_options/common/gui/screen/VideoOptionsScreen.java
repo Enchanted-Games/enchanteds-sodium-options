@@ -1,5 +1,6 @@
-package games.enchanted.enchanteds_sodium_options.common.gui;
+package games.enchanted.enchanteds_sodium_options.common.gui.screen;
 
+import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.InputConstants;
 import games.enchanted.enchanteds_sodium_options.common.Logging;
 import games.enchanted.enchanteds_sodium_options.common.gui.widget.option.*;
@@ -23,12 +24,13 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 public class VideoOptionsScreen extends Screen {
     private static final Component TITLE = Component.translatable("options.videoTitle");
     private static final Component DONATION_BUTTON_TEXT = Component.translatable("sodium.options.buttons.donate");
-    private static final int FOOTER_BUTTON_WIDTH = 98;
+    protected static final int FOOTER_BUTTON_WIDTH = 98;
 
     public static boolean forceSodiumScreen = false;
 
@@ -42,9 +44,12 @@ public class VideoOptionsScreen extends Screen {
 
     final ArrayList<OptionWidget<?>> optionWidgets = new ArrayList<>();
 
-    VideoOptionsScreen(Screen parent) {
-        super(TITLE);
+    protected VideoOptionsScreen(Screen parent, Component title) {
+        super(title);
         this.parent = parent;
+    }
+    protected VideoOptionsScreen(Screen parent) {
+        this(parent, TITLE);
     }
 
     public static Screen createSodiumScreen(Screen parent) {
@@ -76,7 +81,7 @@ public class VideoOptionsScreen extends Screen {
             Button.builder(ComponentUtil.APPLY, button -> this.saveChanges()).width(FOOTER_BUTTON_WIDTH).build()
         );
         this.doneButton = footerLayout.addChild(
-            Button.builder(CommonComponents.GUI_DONE, button -> this.onClose()).width(FOOTER_BUTTON_WIDTH).build()
+            this.buildDoneButtonWidget()
         );
 
         this.optionsList = new VideoOptionsList(
@@ -87,6 +92,23 @@ public class VideoOptionsScreen extends Screen {
         );
         this.addRenderableWidget(this.optionsList);
 
+        buildSodiumOptionWidgets();
+
+        this.visitOptionsAndAddListeners();
+        this.layout.visitWidgets(this::addRenderableWidget);
+
+        this.updateFooterButtonState();
+        this.repositionElements();
+    }
+
+    protected AbstractWidget buildDoneButtonWidget() {
+        return Button.builder(CommonComponents.GUI_DONE, button -> this.onClose()).width(FOOTER_BUTTON_WIDTH).build();
+    }
+
+    protected void buildSodiumOptionWidgets() {
+        if(this.optionsList == null) {
+            throw new IllegalStateException("optionList is null trying to build sodium option widgets");
+        }
 
         List<ModOptions> modOptions = ConfigManager.CONFIG.getModOptions();
 
@@ -109,12 +131,11 @@ public class VideoOptionsScreen extends Screen {
                     Component name, Consumer<Screen> currentScreenConsumer
                 )) {
                     this.optionsList.addBigOption(
-                        Button.builder(name, button -> currentScreenConsumer.accept(this)).build(),
+                        Button.builder(ComponentUtil.appendEllipsis(name), button -> currentScreenConsumer.accept(this)).build(),
                         modInfo
                     );
                 }
                 else if(page instanceof OptionPage optionPage) {
-                    this.optionsList.addCategoryHeader(page.name(), modInfo);
                     buildPageOptions(optionPage, modInfo);
                 }
                 else {
@@ -122,16 +143,37 @@ public class VideoOptionsScreen extends Screen {
                 }
             }
         }
-
-        this.visitOptionsAndAddListeners();
-        this.layout.visitWidgets(this::addRenderableWidget);
-
-        this.updateFooterButtonState();
-        this.repositionElements();
     }
 
-    public void buildPageOptions(OptionPage page, VideoOptionsList.ModInfo modInfo) {
-        var groups = page.groups();
+    protected void buildPageOptions(OptionPage page, VideoOptionsList.ModInfo modInfo) {
+        if(this.optionsList == null) {
+            throw new IllegalStateException("optionList is null trying to build page options");
+        }
+
+        this.optionsList.addCategoryHeader(page.name(), modInfo);
+
+        ImmutableList<OptionGroup> groups = page.groups();
+
+        AtomicInteger totalOptions = new AtomicInteger();
+        page.groups().forEach(optionGroup -> totalOptions.addAndGet(optionGroup.options().size()));
+
+        if(totalOptions.get() > 6 && !modInfo.id().equals("sodium")) {
+            this.optionsList.addBigOption(
+                Button.builder(ComponentUtil.appendEllipsis(page.name()), button -> {
+                    this.minecraft.setScreen(new SubVideoOptionsScreen(page, this, modInfo));
+                }).build(),
+                modInfo
+            );
+            return;
+        }
+
+        buildGroupOptions(groups, modInfo);
+    }
+
+    protected void buildGroupOptions(ImmutableList<OptionGroup> groups, VideoOptionsList.ModInfo modInfo) {
+        if(this.optionsList == null) {
+            throw new IllegalStateException("optionList is null trying to build group options");
+        }
 
         for(OptionGroup group : groups) {
             if(group.name() != null) {
@@ -209,12 +251,12 @@ public class VideoOptionsScreen extends Screen {
         this.updateFooterButtonState();
     }
 
-    private void anyOptionChanged() {
+    protected void anyOptionChanged() {
         updateFooterButtonState();
         this.optionWidgets.forEach(OptionWidget::refreshVisual);
     }
 
-    private void updateFooterButtonState() {
+    protected void updateFooterButtonState() {
         if(this.undoButton == null || this.applyButton == null || this.doneButton == null) return;
         if(hasPendingChanges()) {
             this.undoButton.active = true;
@@ -229,11 +271,15 @@ public class VideoOptionsScreen extends Screen {
 
     @Override
     public boolean keyPressed(KeyEvent event) {
-        if(event.hasAltDown() && event.key() == InputConstants.KEY_P) {
+        if(this.shouldOpenSodiumScreenOnKeybind() && event.hasAltDown() && event.key() == InputConstants.KEY_P) {
             Minecraft.getInstance().setScreen(createSodiumScreen(this.parent));
             return true;
         }
         return super.keyPressed(event);
+    }
+
+    protected boolean shouldOpenSodiumScreenOnKeybind() {
+        return true;
     }
 
     @Override

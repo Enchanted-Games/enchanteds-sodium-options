@@ -13,5 +13,7 @@
 
   "gui.enchanted_sodium_options.unknown_option": "Unknown: %s",
   "gui.enchanted_sodium_options.unknown_option.tooltip.1": "Report this to Enchanted's Sodium Options!! Do not report this issue to Sodium, %s, or any other mod!",
-  "gui.enchanted_sodium_options.unknown_option.tooltip.2": "Option '%s' could not be displayed by Enchanted's Sodium Options.\nOption type: '%s'"
+  "gui.enchanted_sodium_options.unknown_option.tooltip.2": "Option '%s' could not be displayed by Enchanted's Sodium Options.\nOption type: '%s'",
+
+  "gui.enchanted_sodium_options.ellipsis": "%s..."
 }

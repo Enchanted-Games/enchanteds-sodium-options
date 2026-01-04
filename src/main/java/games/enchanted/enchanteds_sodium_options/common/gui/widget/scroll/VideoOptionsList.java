@@ -286,7 +286,6 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
 
     static class CategoryHeaderEntry extends Entry {
         private static final int LEFT_TEXT_OFFSET = 1;
-        private static final Margin HEADER_MARGINS = new Margin(8, 0, LEFT_TEXT_OFFSET, 0);
 
         final Font font = Minecraft.getInstance().font;
         final Component title;
@@ -298,7 +297,7 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
 
         CategoryHeaderEntry(Component header, ModInfo info, int textColour) {
             super(info);
-            setMargins(HEADER_MARGINS);
+            setMargins(new Margin(5, 0, LEFT_TEXT_OFFSET, 0));
             this.title = header;
             this.textColour = textColour;
         }
@@ -363,7 +362,7 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
 
         ModTitleEntry(Component title, Component version, @Nullable Identifier icon, boolean monochromeIcon, ModInfo info) {
             super(info);
-            setMargins(CategoryHeaderEntry.HEADER_MARGINS);
+            setMargins(new Margin(8, 0, CategoryHeaderEntry.LEFT_TEXT_OFFSET, 0));
             this.title = title;
             this.icon = icon;
             this.version = version;
@@ -384,7 +383,7 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
             final boolean hasIcon = this.icon != null && ConfigOptions.SHOW_MOD_ICONS.getValue();
 
             final int iconSize = hasIcon ? (int) (this.font.lineHeight * 1.5) : 0;
-            final int gap = hasIcon ? 3 : CategoryHeaderEntry.LEFT_TEXT_OFFSET;
+            final int gap = hasIcon ? 3 : 0;
 
             if(hasIcon) {
                 graphics.blit(

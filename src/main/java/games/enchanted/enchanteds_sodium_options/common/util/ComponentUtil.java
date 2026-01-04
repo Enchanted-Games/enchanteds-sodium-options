@@ -34,4 +34,9 @@ public class ComponentUtil {
     public static Component componentForOption(String optionId, boolean tooltip) {
         return Component.translatable(OPTION_PREFIX + optionId + (tooltip ? OPTION_TOOLTIP_SUFFIX : ""));
     }
+
+    public static Component appendEllipsis(Component base) {
+        if(base.getString().endsWith("..")) return base;
+        return Component.translatable("gui.enchanted_sodium_options.ellipsis", base);
+    }
 }

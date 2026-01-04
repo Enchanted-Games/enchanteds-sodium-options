@@ -3,7 +3,7 @@ package games.enchanted.enchanteds_sodium_options.common.mixin.sodium;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Cancellable;
-import games.enchanted.enchanteds_sodium_options.common.gui.VideoOptionsScreen;
+import games.enchanted.enchanteds_sodium_options.common.gui.screen.VideoOptionsScreen;
 import net.caffeinemc.mods.sodium.client.gui.SodiumOptions;
 import net.caffeinemc.mods.sodium.client.gui.VideoSettingsScreen;
 import net.minecraft.client.gui.screens.Screen;
