@@ -18,7 +18,7 @@ public class SodiumConfigEntry implements ConfigEntryPoint {
     @Override
     public void registerConfigLate(ConfigBuilder builder) {
         builder.registerOwnModOptions()
-            .setIcon(Identifier.fromNamespaceAndPath(ModConstants.MOD_ID, "icon.png"))
+            .setNonTintedIcon(Identifier.fromNamespaceAndPath(ModConstants.MOD_ID, "icon.png"))
             .setColorTheme(builder.createColorTheme().setBaseThemeRGB(ACCENT_COLOUR))
             .addPage(builder.createOptionPage()
                 .setName(Component.translatable("gui.enchanted_sodium_options.group.visual"))

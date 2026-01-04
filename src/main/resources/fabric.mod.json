@@ -28,6 +28,13 @@
       "config": "${id}.mixins.json"
     }
   ],
+  "custom": {
+    "modmenu": {
+      "parent": {
+        "id": "sodium"
+      }
+    }
+  },
   "depends": {
     "minecraft": "${minecraft}",
     "fabricloader": "${fabric_loader_dep_str}",
