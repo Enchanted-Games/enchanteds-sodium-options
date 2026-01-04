@@ -113,21 +113,20 @@ public class VideoOptionsScreen extends Screen {
     }
 
     public AbstractWidget buildOptionWidget(Option option) {
-        final AbstractWidget widget;
         switch (option) {
             case BooleanOption booleanOption -> {
-                widget = new OnOffWidget(0, 0, booleanOption);
+                return new OnOffWidget(0, 0, booleanOption);
             }
             case IntegerOption integerOption -> {
-                widget = new IntegerSliderWidget(0, 0, integerOption);
+                return new IntegerSliderWidget(0, 0, integerOption);
             }
-//            case ExternalButtonOption externalButtonOption -> {
-//                widget = Button.builder(option.getName(), button -> externalButtonOption.getCurrentScreenConsumer().accept(this))
-//                    .width(Button.DEFAULT_WIDTH)
-//                    .build();
-//            }
+            case ExternalButtonOption externalButtonOption -> {
+                return Button.builder(option.getName(), button -> externalButtonOption.getCurrentScreenConsumer().accept(this))
+                    .width(Button.DEFAULT_WIDTH)
+                    .build();
+            }
             case EnumOption<?> enumOption -> {
-                widget = new EnumCyclerWidget<>(0, 0, enumOption);
+                return new EnumCyclerWidget<>(0, 0, enumOption);
             }
             default -> {
                 Logging.warn(
@@ -139,8 +138,6 @@ public class VideoOptionsScreen extends Screen {
                 return new UnknownOptionWidget(0, 0, option);
             }
         }
-
-        return widget;
     }
 
     private void visitOptionsAndAddListeners() {
