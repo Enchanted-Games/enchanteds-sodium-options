@@ -21,6 +21,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.TriState;
 import net.minecraft.util.Util;
 import org.jspecify.annotations.Nullable;
 
@@ -131,52 +132,79 @@ public class VideoOptionsScreen extends Screen {
                 modInfo
             );
 
-            var pages = options.pages();
+            buildPages(options.pages(), modInfo);
+        }
+    }
 
-            for (Page page : pages) {
-                if(page instanceof ExternalPage(
-                    Component name, Consumer<Screen> currentScreenConsumer
-                )) {
-                    this.optionsList.addBigOption(
-                        Button.builder(ComponentUtil.appendEllipsis(name), button -> currentScreenConsumer.accept(this)).build(),
-                        modInfo
-                    );
+    protected void buildPages(ImmutableList<Page> pages, VideoOptionsList.ModInfo modInfo) {
+        if(this.optionsList == null) {
+            throw new IllegalStateException("optionList is null trying to build pages");
+        }
+
+        boolean allPagesCollapsed = true;
+        List<OptionPage> collapsedOptionPages = new ArrayList<>();
+
+        for (Page page : pages) {
+            if(page instanceof ExternalPage(
+                Component name, Consumer<Screen> currentScreenConsumer
+            )) {
+                this.optionsList.addBigOption(
+                    Button.builder(ComponentUtil.appendEllipsis(name), button -> currentScreenConsumer.accept(this)).build(),
+                    modInfo
+                );
+            }
+            else if(page instanceof OptionPage optionPage) {
+                AtomicInteger totalOptions = new AtomicInteger();
+                optionPage.groups().forEach(optionGroup -> totalOptions.addAndGet(optionGroup.options().size()));
+
+                final boolean shouldCollapseThisPage = modInfo.id().equals("sodium") ? ConfigOptions.COLLAPSE_SODIUM_OPTIONS.getValue() : true;
+
+                if(totalOptions.get() > ConfigOptions.COLLAPSE_THRESHOLD.getValue() && shouldCollapseThisPage) {
+                    // if this page is collapsed, skip and add it later
+                    collapsedOptionPages.add(optionPage);
+                    continue;
                 }
-                else if(page instanceof OptionPage optionPage) {
-                    buildPageOptions(optionPage, modInfo);
-                }
-                else {
-                    Logging.warn("Unknown page type. Class: {}, Name: {}", page.getClass().getCanonicalName(), page.name().getString());
-                }
+
+                allPagesCollapsed = false;
+                this.buildPageOptions(optionPage, new CollapsedPageInfo(false, false), modInfo);
+            }
+            else {
+                Logging.warn("Unknown page type. Class: {}, Name: {}", page.getClass().getCanonicalName(), page.name().getString());
+            }
+        }
+
+        if(!collapsedOptionPages.isEmpty()) {
+            if(!allPagesCollapsed) {
+                // TODO: translation
+                this.optionsList.addCategoryHeader(Component.literal("More"), modInfo);
+            }
+
+            for (OptionPage page : collapsedOptionPages) {
+                this.buildPageOptions(page, new CollapsedPageInfo(true, collapsedOptionPages.size() == 1), modInfo);
             }
         }
     }
 
-    protected void buildPageOptions(OptionPage page, VideoOptionsList.ModInfo modInfo) {
+    protected void buildPageOptions(OptionPage page, CollapsedPageInfo collapsedInfo, VideoOptionsList.ModInfo modInfo) {
         if(this.optionsList == null) {
             throw new IllegalStateException("optionList is null trying to build page options");
         }
 
-        this.optionsList.addCategoryHeader(page.name(), modInfo);
-
-        ImmutableList<OptionGroup> groups = page.groups();
-
-        AtomicInteger totalOptions = new AtomicInteger();
-        page.groups().forEach(optionGroup -> totalOptions.addAndGet(optionGroup.options().size()));
-
-        final boolean shouldCollapseThisPage = modInfo.id().equals("sodium") ? ConfigOptions.COLLAPSE_SODIUM_OPTIONS.getValue() : true;
-
-        if(totalOptions.get() > ConfigOptions.COLLAPSE_THRESHOLD.getValue() && shouldCollapseThisPage) {
-            this.optionsList.addBigOption(
-                Button.builder(ComponentUtil.appendEllipsis(page.name()), button -> {
-                    this.minecraft.setScreen(new SubVideoOptionsScreen(page, this, modInfo));
-                }).build(),
-                modInfo
-            );
+        if(!collapsedInfo.collapsed()) {
+            this.optionsList.addCategoryHeader(page.name(), modInfo);
+            buildGroupOptions(page.groups(), modInfo);
             return;
         }
 
-        buildGroupOptions(groups, modInfo);
+        AbstractWidget subPageButton = Button.builder(ComponentUtil.appendEllipsis(page.name()), button -> {
+            this.minecraft.setScreen(new SubVideoOptionsScreen(page, this, modInfo));
+        }).build();
+
+        if(collapsedInfo.onlyPageCollapsed()) {
+            this.optionsList.addBigOption(subPageButton, modInfo);
+        } else {
+            this.optionsList.addOption(subPageButton, modInfo);
+        }
     }
 
     protected void buildGroupOptions(ImmutableList<OptionGroup> groups, VideoOptionsList.ModInfo modInfo) {
@@ -317,5 +345,8 @@ public class VideoOptionsScreen extends Screen {
             );
             this.optionsList.repositionElements();
         }
+    }
+
+    protected record CollapsedPageInfo(boolean collapsed, boolean onlyPageCollapsed) {
     }
 }

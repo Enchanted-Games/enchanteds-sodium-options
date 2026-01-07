@@ -341,7 +341,7 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
 
         ModTitleEntry(Component title, Component version, @Nullable Identifier icon, boolean monochromeIcon, ModInfo info) {
             super(info);
-            setMargins(new Margin(8, 4, CategoryHeaderEntry.LEFT_TEXT_OFFSET, 0));
+            setMargins(new Margin(8, 3, CategoryHeaderEntry.LEFT_TEXT_OFFSET, 0));
             this.title = title;
             this.icon = icon;
             this.version = version;
@@ -408,7 +408,7 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
 
         CategoryHeaderEntry(Component header, ModInfo info, int textColour) {
             super(info);
-            setMargins(new Margin(1, 0, LEFT_TEXT_OFFSET, 0));
+            setMargins(new Margin(2, 0, LEFT_TEXT_OFFSET, 0));
             this.title = header;
             this.textColour = textColour;
         }

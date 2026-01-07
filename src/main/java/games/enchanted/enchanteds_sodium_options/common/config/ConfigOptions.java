@@ -8,6 +8,7 @@ import games.enchanted.enchanteds_sodium_options.common.PlatformHelper;
 import games.enchanted.enchanteds_sodium_options.common.config.option.BoolOption;
 import games.enchanted.enchanteds_sodium_options.common.config.option.ConfigOption;
 import games.enchanted.enchanteds_sodium_options.common.config.option.IntOption;
+import games.enchanted.enchanteds_sodium_options.common.config.option.integer.CollapseThresholdOption;
 import net.caffeinemc.mods.sodium.api.config.option.Range;
 
 import java.io.*;
@@ -43,10 +44,10 @@ public class ConfigOptions {
     ));
 
     // behaviour
-    public static final ConfigOption<Integer> COLLAPSE_THRESHOLD = registerOption(new IntOption(
+    public static final ConfigOption<Integer> COLLAPSE_THRESHOLD = registerOption(new CollapseThresholdOption(
         6,
         6,
-        new Range(1, 48, 1),
+        new Range(0, 48, 1),
         "collapse_threshold"
     ));
 

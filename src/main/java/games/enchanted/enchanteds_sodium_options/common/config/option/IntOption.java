@@ -32,6 +32,10 @@ public class IntOption extends ConfigOption<Integer> {
         this.setValueOrPending(value);
     }
 
+    protected Component formatValue(int value) {
+        return Component.literal("" + value);
+    }
+
     @Override
     public StatefulOptionBuilder<Integer> createSodiumOption(ConfigBuilder builder, OptionGroupBuilder group) {
         String optionId = this.getJsonKey();
@@ -48,6 +52,6 @@ public class IntOption extends ConfigOption<Integer> {
             )
             .setDefaultValue(this.getDefaultValue())
             .setRange(this.range)
-            .setValueFormatter(i -> Component.literal("" + i));
+            .setValueFormatter(this::formatValue);
     }
 }
