@@ -3,8 +3,8 @@ package games.enchanted.enchanteds_sodium_options.common.gui.screen;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.InputConstants;
 import games.enchanted.enchanteds_sodium_options.common.Logging;
+import games.enchanted.enchanteds_sodium_options.common.ModConstants;
 import games.enchanted.enchanteds_sodium_options.common.config.ConfigOptions;
-import games.enchanted.enchanteds_sodium_options.common.config.option.ConfigOption;
 import games.enchanted.enchanteds_sodium_options.common.gui.widget.option.*;
 import games.enchanted.enchanteds_sodium_options.common.gui.widget.scroll.VideoOptionsList;
 import games.enchanted.enchanteds_sodium_options.common.mixin.accessor.sodium.OptionAccessor;
@@ -12,19 +12,24 @@ import games.enchanted.enchanteds_sodium_options.common.util.ComponentUtil;
 import net.caffeinemc.mods.sodium.client.config.ConfigManager;
 import net.caffeinemc.mods.sodium.client.config.structure.*;
 import net.caffeinemc.mods.sodium.client.gui.VideoSettingsScreen;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.layouts.LinearLayout;
+import net.minecraft.client.gui.screens.ConfirmLinkScreen;
+import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.TriState;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.util.CommonColors;
 import net.minecraft.util.Util;
 import org.jspecify.annotations.Nullable;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -63,45 +68,54 @@ public class VideoOptionsScreen extends Screen {
     }
 
     public static Screen create(Screen parent) {
-        return new VideoOptionsScreen(parent);
+        try {
+            return new VideoOptionsScreen(parent);
+        } catch (Exception e) {
+            return createErrorScreen(e, parent);
+        }
     }
 
     @Override
     protected void init() {
-        this.layout.addTitleHeader(this.title, this.font);
-        int headerHeight = this.layout.getHeaderHeight();
+        try {
+            this.layout.addTitleHeader(this.title, this.font);
+            int headerHeight = this.layout.getHeaderHeight();
 
-        this.donateButton = Button.builder(DONATION_BUTTON_TEXT, button -> {
-            Util.getPlatform().openUri("https://caffeinemc.net/donate");
-        }).width(FOOTER_BUTTON_WIDTH).build();
-        this.addRenderableWidget(this.donateButton);
+            this.donateButton = Button.builder(DONATION_BUTTON_TEXT, button -> {
+                Util.getPlatform().openUri("https://caffeinemc.net/donate");
+            }).width(FOOTER_BUTTON_WIDTH).build();
+            this.addRenderableWidget(this.donateButton);
 
-        LinearLayout footerLayout = this.layout.addToFooter(LinearLayout.horizontal().spacing(8));
-        this.undoButton = footerLayout.addChild(
-            Button.builder(ComponentUtil.UNDO, button -> this.undoChanges()).width(FOOTER_BUTTON_WIDTH).build()
-        );
-        this.applyButton = footerLayout.addChild(
-            Button.builder(ComponentUtil.APPLY, button -> this.saveChanges()).width(FOOTER_BUTTON_WIDTH).build()
-        );
-        this.doneButton = footerLayout.addChild(
-            this.buildDoneButtonWidget()
-        );
+            LinearLayout footerLayout = this.layout.addToFooter(LinearLayout.horizontal().spacing(8));
+            this.undoButton = footerLayout.addChild(
+                Button.builder(ComponentUtil.UNDO, button -> this.undoChanges()).width(FOOTER_BUTTON_WIDTH).build()
+            );
+            this.applyButton = footerLayout.addChild(
+                Button.builder(ComponentUtil.APPLY, button -> this.saveChanges()).width(FOOTER_BUTTON_WIDTH).build()
+            );
+            this.doneButton = footerLayout.addChild(
+                this.buildDoneButtonWidget()
+            );
 
-        this.optionsList = new VideoOptionsList(
-            0,
-            headerHeight,
-            this.width,
-            this.height - headerHeight - this.layout.getFooterHeight()
-        );
-        this.addRenderableWidget(this.optionsList);
+            this.optionsList = new VideoOptionsList(
+                0,
+                headerHeight,
+                this.width,
+                this.height - headerHeight - this.layout.getFooterHeight()
+            );
+            this.addRenderableWidget(this.optionsList);
 
-        buildSodiumOptionWidgets();
+            buildSodiumOptionWidgets();
 
-        this.visitOptionsAndAddListeners();
-        this.layout.visitWidgets(this::addRenderableWidget);
+            this.visitOptionsAndAddListeners();
+            this.layout.visitWidgets(this::addRenderableWidget);
 
-        this.updateFooterButtonState();
-        this.repositionElements();
+            this.updateFooterButtonState();
+            this.repositionElements();
+        }
+        catch (Exception e) {
+            Minecraft.getInstance().setScreen(createErrorScreen(e, this.parent));
+        }
     }
 
     protected AbstractWidget buildDoneButtonWidget() {
@@ -344,6 +358,48 @@ public class VideoOptionsScreen extends Screen {
             );
             this.optionsList.repositionElements();
         }
+    }
+
+    public static Screen createErrorScreen(@Nullable Exception e, Screen parent) {
+        final String baseKey = "gui.enchanted_sodium_options.error_screen.body.";
+        MutableComponent body = Component.empty().append(Component.translatable(baseKey + "1"));
+
+        if(e != null) {
+            Logging.error("Exception occurred while trying to show video setting screen.\n{}", e.toString());
+            StackTraceElement[] traceElements = e.getStackTrace();
+            StringBuilder builder = new StringBuilder("Stacktrace:");
+            for (StackTraceElement traceElement : traceElements) {
+                builder.append("\n").append("  ").append(traceElement);
+            }
+            Logging.error("{}", builder.toString());
+
+            body.append("\n");
+            body.append(Component.literal(e.getMessage()).withStyle(
+                style -> style.withColor(CommonColors.GRAY)
+            ));
+        }
+
+        body.append("\n\n");
+        body.append(Component.translatable(baseKey + "2").withStyle(style -> style.withBold(true)));
+        body.append("\n\n");
+        body.append(Component.translatable(baseKey + "3").withStyle(style ->
+            style.withBold(true).withColor(ChatFormatting.RED)
+        ));
+
+        return new ConfirmScreen(
+            confirmed -> {
+                if(confirmed) {
+                    Util.getPlatform().openUri(ModConstants.ISSUE_URI);
+                } else {
+
+                    Minecraft.getInstance().setScreen(VideoOptionsScreen.createSodiumScreen(parent));
+                }
+            },
+            ComponentUtil.MOD_NAME,
+            body,
+            Component.translatable("gui.enchanted_sodium_options.report_button"),
+            Component.translatable("gui.enchanted_sodium_options.sodium_screen")
+        );
     }
 
     protected record CollapsedPageInfo(boolean collapsed, boolean onlyPageCollapsed) {

@@ -24,5 +24,11 @@
   "gui.enchanted_sodium_options.unknown_option.tooltip.1": "Report this to Enchanted's Sodium Options!! Do not report this issue to Sodium, %s, or any other mod!",
   "gui.enchanted_sodium_options.unknown_option.tooltip.2": "Option '%s' could not be displayed by Enchanted's Sodium Options.\nOption type: '%s'",
 
+  "gui.enchanted_sodium_options.error_screen.body.1": "Something went catastrophically wrong trying to show the video settings screen.",
+  "gui.enchanted_sodium_options.error_screen.body.2": "This is an issue with Enchanted's Sodium Options, please make a report by clicking the button below!",
+  "gui.enchanted_sodium_options.error_screen.body.3": "DO NOT report this to the maintainers of Sodium!!",
+  "gui.enchanted_sodium_options.report_button": "Report Issue",
+  "gui.enchanted_sodium_options.sodium_screen": "Continue to Sodium Screen",
+
   "gui.enchanted_sodium_options.ellipsis": "%s..."
 }

@@ -9,6 +9,7 @@ import net.minecraft.util.CommonColors;
 public class ComponentUtil {
     public static final Component APPLY = Component.translatable("sodium.options.buttons.apply");
     public static final Component UNDO = Component.translatable("sodium.options.buttons.undo");
+    public static final Component MOD_NAME = Component.translatable("gui.enchanted_sodium_options.name");
 
     public static final String OPTION_PREFIX = "gui.enchanted_sodium_options.option.";
     public static final String OPTION_TOOLTIP_SUFFIX = ".tooltip";
