@@ -6,7 +6,7 @@ public class ModConstants {
     public static final String MOD_NAME = "Enchanted's Sodium Options";
     public static final String MOD_ID = "enchanteds_sodium_options";
 
-    public static URI ISSUE_URI = URI.create("https://github.com/Enchanted-Games/enchanteds-sodium-options/issues");
+    public static URI ISSUE_URI = URI.create("https://github.com/Enchanted-Games/enchanteds-sodium-options/issues/new?template=bug_report.md");
 
     public static final String TARGET_PLATFORM =
     //? if fabric {
