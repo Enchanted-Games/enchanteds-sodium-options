@@ -1,0 +1,34 @@
+{
+  "gui.enchanted_sodium_options.name": "Enchanted's Sodium Options",
+
+  "gui.enchanted_sodium_options.group.visual": "Görsellik",
+  "gui.enchanted_sodium_options.option.accent_bars": "Renkli Vurgu Barları",
+  "gui.enchanted_sodium_options.option.accent_bars.tooltip": "Etkinleştirildiğinde, her mod için ayarların solunda renkli bir bar gösterilecektir.",
+  "gui.enchanted_sodium_options.option.show_mod_icons": "Mod İkonlarını Göster",
+  "gui.enchanted_sodium_options.option.show_mod_icons.tooltip": "Ayarlar ekranında mod simgelerinin gösterilip gösterilmeyeceği.",
+  "gui.enchanted_sodium_options.option.coloured_header_text": "Renkli Mod Başlıkları",
+  "gui.enchanted_sodium_options.option.coloured_header_text.tooltip": "Etkinleştirildiğinde, ayar ekranındaki mod başlıkları için vurgu renkleri kullanılacaktır.",
+  "gui.enchanted_sodium_options.option.coloured_category_text": "Renkli Kategori Başlıkları",
+  "gui.enchanted_sodium_options.option.coloured_category_text.tooltip": "Etkinleştirildiğinde, ayar ekranındaki kategori başlıkları için vurgu renkleri kullanılacaktır.",
+
+  "gui.enchanted_sodium_options.group.behaviour": "Davranışlar",
+  "gui.enchanted_sodium_options.option.collapse_threshold": "Daralma Eşiği",
+  "gui.enchanted_sodium_options.option.collapse_threshold.value.collapse_all": "Hepsini Daralt",
+  "gui.enchanted_sodium_options.option.collapse_threshold.tooltip": "Bir ayar kategorisinin, içeriği bir alt menüye daraltılmadan önce sahip olabileceği maksimum seçenek miktarı.\nBu, video ayarları ekranını kapatıp yeniden açana kadar geçerli değildir.",
+  "gui.enchanted_sodium_options.option.collapse_sodium_options": "Sodium Ayarlarını Daralt",
+  "gui.enchanted_sodium_options.option.collapse_sodium_options.tooltip": "Daraltma eşiği karşılanırsa Sodium'un ayarlarının bir alt menüye daraltılıp daraltılmayacağı.\nBu, video ayarları ekranını kapatıp yeniden açana kadar geçerli değildir.",
+
+  "gui.enchanted_sodium_options.group.more": "Daha Fazla",
+
+  "gui.enchanted_sodium_options.unknown_option": "Bilinmeyen: %s",
+  "gui.enchanted_sodium_options.unknown_option.tooltip.1": "Bu sorunu Enchanted's Sodium Options'a bildirin!! Bu sorunu Sodium, %s, yada herhangi başka bir mod'a bildirmeyin!",
+  "gui.enchanted_sodium_options.unknown_option.tooltip.2": "'%s' ayarı, Enchanted's Sodium Options tarafından görüntülenemedi.\nAyar Türü: '%s'",
+
+  "gui.enchanted_sodium_options.error_screen.body.1": "Video ayarları ekranı gösterilmeye çalışılırken bir şeyler feci şekilde ters gitti.",
+  "gui.enchanted_sodium_options.error_screen.body.2": "Bu Enchanted's Sodium Options ile ilgili bir sorundur, lütfen aşağıdaki düğmeye tıklayarak bir rapor oluşturun!",
+  "gui.enchanted_sodium_options.error_screen.body.3": "Bu sorunu Sodyum geliştiricilerine BİLDİRMEYİN!!",
+  "gui.enchanted_sodium_options.report_button": "Sorun Bildir",
+  "gui.enchanted_sodium_options.sodium_screen": "Sodium ekranına devam et",
+
+  "gui.enchanted_sodium_options.ellipsis": "%s..."
+}
