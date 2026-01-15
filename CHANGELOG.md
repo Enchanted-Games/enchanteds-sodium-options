@@ -1,2 +1,4 @@
-# 1.0
-// TODO: Write changelog before publishing your mod
+# 1.0.1
+
+- Prevent loading on Sodium v0.8.3
+- Fixed dependency on Sodium not being present

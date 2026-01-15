@@ -38,6 +38,7 @@
   "depends": {
     "minecraft": "${minecraft}",
     "fabricloader": "${fabric_loader_dep_str}",
-    "fabric-api": "${fabric_api_dep_str}"
+    "fabric-api": "${fabric_api_dep_str}",
+    "sodium": "${sodium_dep_str}"
   }
 }

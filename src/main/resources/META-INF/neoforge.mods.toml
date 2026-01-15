@@ -22,3 +22,9 @@ modId="minecraft"
 type="required"
 versionRange="${minecraft}"
 side="CLIENT"
+
+[[dependencies.${id}]]
+modId="sodium"
+type="required"
+versionRange="${sodium_dep_str}"
+side="CLIENT"
