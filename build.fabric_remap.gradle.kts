@@ -171,6 +171,7 @@ publishMods {
             minecraftVersions.add(property("deps.minecraft").toString())
             minecraftVersions.addAll(additionalVersions)
             requires("fabric-api")
+            requires("sodium")
             optional("modmenu")
         }
     }
@@ -182,6 +183,7 @@ publishMods {
             minecraftVersions.add(stonecutter.current.version)
             minecraftVersions.addAll(additionalVersions)
             requires("fabric-api")
+            requires("sodium")
         }
     }
 }
