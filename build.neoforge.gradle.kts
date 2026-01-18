@@ -44,12 +44,22 @@ repositories {
         name = "Caffeine MC Snapshots (sodium)"
         url = uri("https://maven.caffeinemc.net/snapshots")
     }
+    maven {
+        name = "Modrinth (iris)"
+        url = uri("https://api.modrinth.com/maven")
+        content {
+            includeGroup("maven.modrinth")
+        }
+    }
 }
 
 dependencies {
     // Sodium
     compileOnly("net.caffeinemc:sodium-neoforge-mod:${property("deps.sodium")}")
     runtimeOnly("net.caffeinemc:sodium-neoforge:${property("deps.sodium")}")
+
+    // iris
+    compileOnly("maven.modrinth:iris:${property("deps.iris")}-neoforge")
 }
 
 stonecutter {

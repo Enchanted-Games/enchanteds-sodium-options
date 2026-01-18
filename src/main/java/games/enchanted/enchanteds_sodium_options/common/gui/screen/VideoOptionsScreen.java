@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.InputConstants;
 import games.enchanted.enchanteds_sodium_options.common.Logging;
 import games.enchanted.enchanteds_sodium_options.common.ModConstants;
+import games.enchanted.enchanteds_sodium_options.common.compat.iris.IrisShaderButtonBuilder;
 import games.enchanted.enchanteds_sodium_options.common.config.ConfigOptions;
 import games.enchanted.enchanteds_sodium_options.common.gui.widget.option.*;
 import games.enchanted.enchanteds_sodium_options.common.gui.widget.scroll.VideoOptionsList;
@@ -18,7 +19,6 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.layouts.LinearLayout;
-import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
@@ -29,7 +29,6 @@ import net.minecraft.util.CommonColors;
 import net.minecraft.util.Util;
 import org.jspecify.annotations.Nullable;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -48,7 +47,9 @@ public class VideoOptionsScreen extends Screen {
     @Nullable AbstractWidget undoButton;
     @Nullable AbstractWidget applyButton;
     @Nullable AbstractWidget doneButton;
+
     @Nullable AbstractWidget donateButton;
+    @Nullable AbstractWidget shaderpacksButton;
 
     final ArrayList<OptionWidget<?>> optionWidgets = new ArrayList<>();
 
@@ -85,6 +86,11 @@ public class VideoOptionsScreen extends Screen {
                 Util.getPlatform().openUri("https://caffeinemc.net/donate");
             }).width(FOOTER_BUTTON_WIDTH).build();
             this.addRenderableWidget(this.donateButton);
+
+            this.shaderpacksButton = IrisShaderButtonBuilder.getInstance().createShaderpacksButton(this, FOOTER_BUTTON_WIDTH);
+            if(this.shaderpacksButton != null) {
+                this.addRenderableWidget(this.shaderpacksButton);
+            }
 
             LinearLayout footerLayout = this.layout.addToFooter(LinearLayout.horizontal().spacing(8));
             this.undoButton = footerLayout.addChild(
@@ -344,9 +350,16 @@ public class VideoOptionsScreen extends Screen {
         this.layout.arrangeElements();
         int headerHeight = this.layout.getHeaderHeight();
 
+        if(this.shaderpacksButton != null) {
+            this.shaderpacksButton.setPosition(
+                this.width - this.shaderpacksButton.getWidth() - 8,
+                (headerHeight / 2) - this.shaderpacksButton.getHeight() / 2
+            );
+        }
+
         if(this.donateButton != null) {
             this.donateButton.setPosition(
-                this.width - this.donateButton.getWidth() - 8,
+                8,
                 (headerHeight / 2) - this.donateButton.getHeight() / 2
             );
         }
