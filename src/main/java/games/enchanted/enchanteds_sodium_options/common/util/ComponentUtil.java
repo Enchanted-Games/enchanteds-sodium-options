@@ -5,6 +5,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
+import org.jspecify.annotations.Nullable;
 
 public class ComponentUtil {
     public static final Component APPLY = Component.translatable("sodium.options.buttons.apply");
@@ -15,11 +16,12 @@ public class ComponentUtil {
     public static final String OPTION_TOOLTIP_SUFFIX = ".tooltip";
 
     public static Component createOptionTooltip(Option option) {
-        if(option.getImpact() == null) return option.getTooltip();
-        return option.getTooltip().copy().append("\n\n")
-            .append(Component.translatable("sodium.options.performance_impact_string", option.getImpact().getName())
-                .withStyle(ChatFormatting.GRAY)
-            );
+        return option.getTooltip();
+    }
+
+    public static @Nullable Component createPerformanceImpact(Option option) {
+        if(option.getImpact() == null) return null;
+        return Component.translatable("sodium.options.performance_impact_string", option.getImpact().getName()).withStyle(ChatFormatting.GRAY);
     }
 
     public static Component optionMessage(Component optionName, Component value, boolean active, boolean modified) {

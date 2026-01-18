@@ -1,16 +1,15 @@
 package games.enchanted.enchanteds_sodium_options.common.gui.widget.option;
 
-import games.enchanted.enchanteds_sodium_options.common.gui.widget.util.TooltipUtil;
+import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.TooltipContent;
 import games.enchanted.enchanteds_sodium_options.common.util.ComponentUtil;
 import net.caffeinemc.mods.sodium.client.config.structure.EnumOption;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.input.InputWithModifiers;
-import net.minecraft.network.chat.Component;
 import org.jspecify.annotations.Nullable;
 
 public class EnumCyclerWidget<T extends Enum<T>> extends Button implements OptionWidget<EnumOption<T>> {
-    final Component tooltipContent;
+    final TooltipContent tooltipContent;
     final EnumOption<T> option;
     T value;
     final T[] enumValues;
@@ -19,7 +18,7 @@ public class EnumCyclerWidget<T extends Enum<T>> extends Button implements Optio
 
     public EnumCyclerWidget(int x, int y, EnumOption<T> option) {
         super(x, y, Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, option.getName(), (button) -> {}, DEFAULT_NARRATION);
-        this.tooltipContent = ComponentUtil.createOptionTooltip(option);
+        this.tooltipContent = new TooltipContent(ComponentUtil.createOptionTooltip(option), this.message, ComponentUtil.createPerformanceImpact(option));
         this.option = option;
         this.value = option.getValidatedValue();
         this.enumValues = this.getOption().enumClass.getEnumConstants();
@@ -38,7 +37,8 @@ public class EnumCyclerWidget<T extends Enum<T>> extends Button implements Optio
             this.isActive(),
             this.option.hasChanged()
         );
-        TooltipUtil.appendMessageToWidgetTooltip(this, this.message, this.tooltipContent);
+        this.tooltipContent.setOptionValue(this.message);
+        this.setTooltip(this.tooltipContent.createTooltip());
     }
 
     @Override
