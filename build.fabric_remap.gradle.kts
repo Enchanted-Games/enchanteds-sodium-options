@@ -10,7 +10,8 @@ val minecraft = stonecutter.current.version
 val mcVersion = stonecutter.current.project.substringBeforeLast('-')
 val accessWidenerFilepath = "src/main/resources/${property("mod.id")}.accesswidener"
 
-version = "${property("mod.version")}+${property("deps.minecraft")}-fabric"
+val modVer = "${property("mod.version")}+${property("deps.sodium_compiled_against")}-mc${property("deps.minecraft")}-fabric"
+version = modVer
 base.archivesName = property("mod.id") as String
 
 repositories {
@@ -93,7 +94,7 @@ tasks.named<ProcessResources>("processResources") {
     fun prop(name: String) = project.property(name) as String
 
     val props = HashMap<String, String>().apply {
-        this["version"] = prop("mod.version") + "+" + prop("deps.minecraft")
+        this["version"] = modVer
         this["minecraft"] = prop("dep_str.minecraft")
         this["id"] = prop("mod.id")
         this["group"] = prop("mod.group")
