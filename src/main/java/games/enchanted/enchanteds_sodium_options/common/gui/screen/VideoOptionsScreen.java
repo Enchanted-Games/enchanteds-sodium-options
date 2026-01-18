@@ -130,6 +130,8 @@ public class VideoOptionsScreen extends Screen {
         List<ModOptions> modOptions = ConfigManager.CONFIG.getModOptions();
 
         for (ModOptions options : modOptions) {
+            if(options.pages().isEmpty()) continue;
+
             var theme = options.theme();
             VideoOptionsList.ModInfo modInfo = new VideoOptionsList.ModInfo(
                 options.configId(),
