@@ -8,6 +8,7 @@ import net.caffeinemc.mods.sodium.api.config.option.SteppedValidator;
 import net.caffeinemc.mods.sodium.client.config.structure.IntegerOption;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
@@ -80,6 +81,27 @@ public class IntegerSliderWidget extends AbstractSliderButton implements Abstrac
         int max = validator.max();
         int step = validator.step();
         return min + step * (int) Math.round(this.value * (max - min) / step);
+    }
+
+    @Override
+    public boolean keyPressed(KeyEvent event) {
+        if (event.isSelection()) {
+            this.canChangeValue = !this.canChangeValue;
+            return true;
+        }
+
+        if (!this.canChangeValue) return false;
+
+        boolean left = event.isLeft();
+        boolean right = event.isRight();
+        int stepValue = this.option.getSteppedValidator().step();
+        if (left || right) {
+            int direction = left ? -stepValue : stepValue;
+            this.setValue(this.getSliderValue(this.realValue + direction));
+            return true;
+        }
+
+        return false;
     }
 
     @Override
