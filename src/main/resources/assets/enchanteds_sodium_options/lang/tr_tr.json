@@ -30,5 +30,6 @@
   "gui.enchanted_sodium_options.report_button": "Sorun Bildir",
   "gui.enchanted_sodium_options.sodium_screen": "Sodium ekranına devam et",
 
-  "gui.enchanted_sodium_options.ellipsis": "%s..."
+  "gui.enchanted_sodium_options.ellipsis": "%s...",
+  "gui.enchanted_sodium_options.version": "v%s"
 }
