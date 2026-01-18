@@ -40,4 +40,8 @@ public class ComponentUtil {
         if(base.getString().endsWith("..")) return base;
         return Component.translatable("gui.enchanted_sodium_options.ellipsis", base);
     }
+
+    public static Component versionString(String version) {
+        return Component.translatable("gui.enchanted_sodium_options.version", version);
+    }
 }

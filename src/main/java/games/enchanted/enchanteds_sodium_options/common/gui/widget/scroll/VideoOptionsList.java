@@ -1,6 +1,7 @@
 package games.enchanted.enchanteds_sodium_options.common.gui.widget.scroll;
 
 import games.enchanted.enchanteds_sodium_options.common.config.ConfigOptions;
+import games.enchanted.enchanteds_sodium_options.common.util.ComponentUtil;
 import net.caffeinemc.mods.sodium.client.gui.ColorTheme;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -63,7 +64,7 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
         return new WidgetPosition(this.children().size() - 1, false);
     }
 
-    public void addModTitle(Component name, Component version, @Nullable Identifier icon, boolean monochromeIcon, ModInfo modInfo) {
+    public void addModTitle(Component name, String version, @Nullable Identifier icon, boolean monochromeIcon, ModInfo modInfo) {
         this.modCategoryTitlePositions.add(new ModTitlePosition(modInfo, this.children().size()));
         trySetLastInCategoryOnBottomEntry(modInfo);
         this.lastEntry = null;
@@ -334,17 +335,19 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
         final Font font = Minecraft.getInstance().font;
         @Nullable final Identifier icon;
         final Component version;
+        final Component truncatedVersion;
         final boolean monochromeIcon;
         final int iconColour;
         final int titleColour;
         final int versionColour;
 
-        ModTitleEntry(Component title, Component version, @Nullable Identifier icon, boolean monochromeIcon, ModInfo info) {
+        ModTitleEntry(Component title, String version, @Nullable Identifier icon, boolean monochromeIcon, ModInfo info) {
             super(info);
             setMargins(new Margin(8, 3, CategoryHeaderEntry.LEFT_TEXT_OFFSET, 0));
             this.title = title;
             this.icon = icon;
-            this.version = version;
+            this.version = ComponentUtil.versionString(version);
+            this.truncatedVersion = ComponentUtil.versionString(version.split("\\+")[0]);
             this.monochromeIcon = monochromeIcon;
             this.iconColour = info.theme().themeLighter;
             this.titleColour = info.theme().themeLighter;
@@ -385,8 +388,9 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
             final boolean colouredText = ConfigOptions.COLOURED_HEADER_TEXT.getValue();
             graphics.drawString(this.font, this.title, this.getContentX() + iconSize + gap, this.getContentY(), colouredText ? this.titleColour : -1);
 
-            final int versionWidth = this.font.width(this.version);
-            graphics.drawString(this.font, this.version, this.getContentRight() - versionWidth, this.getContentY(), colouredText ? this.versionColour : CommonColors.LIGHT_GRAY);
+            Component versionComponent = hovered ? this.version : this.truncatedVersion;
+            final int versionWidth = this.font.width(versionComponent);
+            graphics.drawString(this.font, versionComponent, this.getContentRight() - versionWidth, this.getContentY(), colouredText ? this.versionColour : CommonColors.LIGHT_GRAY);
         }
 
         @Override

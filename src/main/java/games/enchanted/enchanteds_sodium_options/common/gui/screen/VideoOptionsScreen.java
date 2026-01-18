@@ -140,7 +140,7 @@ public class VideoOptionsScreen extends Screen {
 
             this.optionsList.addModTitle(
                 Component.literal(options.name()),
-                Component.literal("v" + options.version()),
+                options.version(),
                 options.icon(),
                 options.iconMonochrome(),
                 modInfo
