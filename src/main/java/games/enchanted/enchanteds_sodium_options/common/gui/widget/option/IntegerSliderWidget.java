@@ -2,6 +2,7 @@ package games.enchanted.enchanteds_sodium_options.common.gui.widget.option;
 
 import games.enchanted.enchanteds_sodium_options.common.ModConstants;
 import games.enchanted.enchanteds_sodium_options.common.gui.widget.extension.AbstractSliderButtonExtension;
+import games.enchanted.enchanteds_sodium_options.common.gui.widget.util.TooltipUtil;
 import games.enchanted.enchanteds_sodium_options.common.util.ComponentUtil;
 import net.caffeinemc.mods.sodium.api.config.option.SteppedValidator;
 import net.caffeinemc.mods.sodium.client.config.structure.IntegerOption;
@@ -9,6 +10,7 @@ import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import org.jspecify.annotations.Nullable;
@@ -16,6 +18,7 @@ import org.jspecify.annotations.Nullable;
 public class IntegerSliderWidget extends AbstractSliderButton implements AbstractSliderButtonExtension, OptionWidget<IntegerOption> {
     private static final Identifier DISABLED_HANDLE_SPRITE = Identifier.fromNamespaceAndPath(ModConstants.MOD_ID, "widget/slider_handle_disabled");
 
+    final Component tooltipContent;
     final IntegerOption option;
     int realValue;
     int prevValue;
@@ -24,7 +27,7 @@ public class IntegerSliderWidget extends AbstractSliderButton implements Abstrac
 
     public IntegerSliderWidget(int x, int y, IntegerOption option) {
         super(x, y, Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, option.getName(), 0);
-        this.setTooltip(Tooltip.create(ComponentUtil.createOptionTooltip(option)));
+        this.tooltipContent = ComponentUtil.createOptionTooltip(option);
         this.option = option;
         this.realValue = option.getAppliedValue();
         this.prevValue = this.realValue;
@@ -45,6 +48,7 @@ public class IntegerSliderWidget extends AbstractSliderButton implements Abstrac
             this.isActive(),
             this.option.hasChanged()
         );
+        TooltipUtil.appendMessageToWidgetTooltip(this, this.message, this.tooltipContent);
     }
 
     @Override

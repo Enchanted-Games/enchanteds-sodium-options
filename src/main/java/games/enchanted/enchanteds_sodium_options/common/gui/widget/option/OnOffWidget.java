@@ -1,5 +1,6 @@
 package games.enchanted.enchanteds_sodium_options.common.gui.widget.option;
 
+import games.enchanted.enchanteds_sodium_options.common.gui.widget.util.TooltipUtil;
 import games.enchanted.enchanteds_sodium_options.common.util.ComponentUtil;
 import net.caffeinemc.mods.sodium.client.config.structure.BooleanOption;
 import net.minecraft.client.gui.GuiGraphics;
@@ -8,6 +9,7 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import org.jspecify.annotations.Nullable;
@@ -15,6 +17,7 @@ import org.jspecify.annotations.Nullable;
 public class OnOffWidget extends Button implements OptionWidget<BooleanOption> {
     private static final Identifier DISABLED_SPRITE = Identifier.withDefaultNamespace("widget/button_disabled");
 
+    final Component tooltipContent;
     final BooleanOption option;
     boolean value;
 
@@ -22,7 +25,7 @@ public class OnOffWidget extends Button implements OptionWidget<BooleanOption> {
 
     public OnOffWidget(int x, int y, BooleanOption option) {
         super(x, y, Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, option.getName(), (button) -> {}, DEFAULT_NARRATION);
-        this.setTooltip(Tooltip.create(ComponentUtil.createOptionTooltip(option)));
+        this.tooltipContent = ComponentUtil.createOptionTooltip(option);
         this.option = option;
         this.value = option.getValidatedValue();
         updateMessage();
@@ -40,6 +43,7 @@ public class OnOffWidget extends Button implements OptionWidget<BooleanOption> {
             this.isActive(),
             this.option.hasChanged()
         );
+        TooltipUtil.appendMessageToWidgetTooltip(this, this.message, this.tooltipContent);
     }
 
     @Override
