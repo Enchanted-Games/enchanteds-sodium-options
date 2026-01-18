@@ -22,6 +22,14 @@ repositories {
             includeGroupAndSubgroups("com.terraformersmc")
         }
     }
+    maven {
+        name = "Caffeine MC (sodium)"
+        url = uri("https://maven.caffeinemc.net/releases")
+    }
+    maven {
+        name = "Caffeine MC Snapshots (sodium)"
+        url = uri("https://maven.caffeinemc.net/snapshots")
+    }
 }
 
 dependencies {
