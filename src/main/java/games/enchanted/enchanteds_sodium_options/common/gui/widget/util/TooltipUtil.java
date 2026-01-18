@@ -9,7 +9,8 @@ public class TooltipUtil {
         Component tooltipContent = Component.empty()
             .append(message.copy().withColor(0xd8d8da))
             .append("\n\n")
-            .append(tooltip);
+            .append(tooltip)
+        ;
         widget.setTooltip(Tooltip.create(tooltipContent, tooltip));
     }
 }

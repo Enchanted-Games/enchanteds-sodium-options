@@ -16,7 +16,7 @@ public class ComponentUtil {
 
     public static Component createOptionTooltip(Option option) {
         if(option.getImpact() == null) return option.getTooltip();
-        return option.getTooltip().copy().append("\n")
+        return option.getTooltip().copy().append("\n\n")
             .append(Component.translatable("sodium.options.performance_impact_string", option.getImpact().getName())
                 .withStyle(ChatFormatting.GRAY)
             );
