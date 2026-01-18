@@ -20,7 +20,7 @@ public abstract class VideoSettingsScreenMixin extends Screen {
 
     @WrapOperation(
         at = @At(value = "INVOKE", target = "Lnet/caffeinemc/mods/sodium/client/gui/SodiumOptions;isReadOnly()Z"),
-        method = "createScreen"
+        method = "createScreen(Lnet/minecraft/client/gui/screens/Screen;Lnet/caffeinemc/mods/sodium/client/config/structure/OptionPage;)Lnet/minecraft/client/gui/screens/Screen;"
     )
     private static boolean wrapSodiumVideoScreenCtor(SodiumOptions instance, Operation<Boolean> original, Screen currentScreen, @Cancellable CallbackInfoReturnable<Screen> cir) {
         boolean configReadOnly = original.call(instance);
