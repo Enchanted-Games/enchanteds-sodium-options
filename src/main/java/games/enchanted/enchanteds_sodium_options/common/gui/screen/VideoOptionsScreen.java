@@ -56,9 +56,9 @@ public class VideoOptionsScreen extends Screen implements TooltipRenderer {
     @Nullable AbstractWidget shaderpacksButton;
 
     final ArrayList<OptionWidget<?>> optionWidgets = new ArrayList<>();
-    ScreenRectangle topHalfRectangle = new ScreenRectangle(0, 0, this.width, this.height / 2);
 
-    @Nullable protected TooltipRenderInfo pendingTooltip = null;
+    ScreenRectangle topHalfRectangle = new ScreenRectangle(0, 0, 0, 0);
+    @Nullable protected TooltipState tooltipState = null;
 
     protected VideoOptionsScreen(Screen parent, Component title) {
         super(title);
@@ -293,20 +293,6 @@ public class VideoOptionsScreen extends Screen implements TooltipRenderer {
 
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
-
-        if(this.pendingTooltip != null) {
-            boolean positionAtBottom = this.pendingTooltip.widgetRectangle().overlaps(this.topHalfRectangle);
-
-            guiGraphics.fill(0, positionAtBottom ? this.height / 2 : 0, this.width, positionAtBottom ? this.height : this.height / 2, 0x33000000);
-            guiGraphics.drawString(this.font, this.pendingTooltip.content().getOptionValue(), 0, this.height / 2, -1);
-            this.pendingTooltip = null;
-        }
-    }
-
-
-    @Override
     public boolean shouldCloseOnEsc() {
         return !this.hasPendingChanges();
     }
@@ -370,8 +356,32 @@ public class VideoOptionsScreen extends Screen implements TooltipRenderer {
     @Override
     public void submitTooltipContent(TooltipContent content, boolean force, ScreenRectangle widgetRectangle) {
         if(!ConfigOptions.ALTERNATIVE_TOOLTIPS.getValue()) return;
-        if(this.pendingTooltip == null || force) {
-            this.pendingTooltip = new TooltipRenderInfo(content, widgetRectangle);
+        if(this.tooltipState == null || force) {
+            this.tooltipState = new TooltipState(content, widgetRectangle);
+        }
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+
+        if(this.tooltipState != null) {
+            boolean positionAtBottom = this.tooltipState.widgetRectangle().overlaps(this.topHalfRectangle);
+            this.renderCustomTooltip(
+                new TooltipRenderState(
+                    this.tooltipState.content(),
+                    0,
+                    positionAtBottom ? this.height / 2 : 0,
+                    this.width,
+                    positionAtBottom ? this.height : this.height / 2
+                ),
+                guiGraphics,
+                mouseX,
+                mouseY,
+                partialTick
+            );
+
+            this.tooltipState = null;
         }
     }
 
@@ -380,7 +390,7 @@ public class VideoOptionsScreen extends Screen implements TooltipRenderer {
     protected void repositionElements() {
         this.layout.arrangeElements();
         int headerHeight = this.layout.getHeaderHeight();
-        this.topHalfRectangle = new ScreenRectangle(0, 0, this.width, this.height / 2);
+        this.topHalfRectangle = new ScreenRectangle(0, 0, this.width, (this.height / 2) - (Button.DEFAULT_HEIGHT / 2));
 
         if(this.shaderpacksButton != null) {
             this.shaderpacksButton.setPosition(
@@ -451,6 +461,6 @@ public class VideoOptionsScreen extends Screen implements TooltipRenderer {
     protected record CollapsedPageInfo(boolean collapsed, boolean onlyPageCollapsed) {
     }
 
-    protected record TooltipRenderInfo(TooltipContent content, ScreenRectangle widgetRectangle) {
+    protected record TooltipState(TooltipContent content, ScreenRectangle widgetRectangle) {
     }
 }
