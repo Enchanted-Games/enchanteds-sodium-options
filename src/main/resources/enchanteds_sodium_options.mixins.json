@@ -8,6 +8,7 @@
   ],
   "client": [
     "AbstractSliderButtonMixin",
+    "AbstractWidgetMixin",
     "sodium.VideoSettingsScreenMixin"
   ],
   "injectors": {

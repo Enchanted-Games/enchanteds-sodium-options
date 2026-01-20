@@ -1,6 +1,8 @@
 package games.enchanted.enchanteds_sodium_options.common.gui.widget.option;
 
+import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.AbstractWidgetPreventTooltipRender;
 import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.TooltipContent;
+import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.TooltipRenderer;
 import games.enchanted.enchanteds_sodium_options.common.util.ComponentUtil;
 import net.caffeinemc.mods.sodium.client.config.structure.EnumOption;
 import net.minecraft.client.gui.GuiGraphics;
@@ -8,17 +10,20 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.input.InputWithModifiers;
 import org.jspecify.annotations.Nullable;
 
-public class EnumCyclerWidget<T extends Enum<T>> extends Button implements OptionWidget<EnumOption<T>> {
+public class EnumCyclerWidget<T extends Enum<T>> extends Button implements OptionWidget<EnumOption<T>>, AbstractWidgetPreventTooltipRender {
     final TooltipContent tooltipContent;
+    final TooltipRenderer tooltipRenderer;
+
     final EnumOption<T> option;
     T value;
     final T[] enumValues;
 
     @Nullable OnChange onChange = null;
 
-    public EnumCyclerWidget(int x, int y, EnumOption<T> option) {
+    public EnumCyclerWidget(int x, int y, EnumOption<T> option, TooltipRenderer tooltipRenderer) {
         super(x, y, Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, option.getName(), (button) -> {}, DEFAULT_NARRATION);
         this.tooltipContent = new TooltipContent(ComponentUtil.createOptionTooltip(option), this.message, ComponentUtil.createPerformanceImpact(option));
+        this.tooltipRenderer = tooltipRenderer;
         this.option = option;
         this.value = option.getValidatedValue();
         this.enumValues = this.getOption().enumClass.getEnumConstants();
@@ -45,6 +50,9 @@ public class EnumCyclerWidget<T extends Enum<T>> extends Button implements Optio
     protected void renderContents(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         this.renderDefaultSprite(guiGraphics);
         this.renderDefaultLabel(guiGraphics.textRendererForWidget(this, GuiGraphics.HoveredTextEffects.NONE));
+        if(this.isHoveredOrFocused()) {
+            this.tooltipRenderer.submitTooltipContent(this.tooltipContent, this.isHovered(), this.getRectangle());
+        }
     }
 
     @Override

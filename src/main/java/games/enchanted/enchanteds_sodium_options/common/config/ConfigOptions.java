@@ -43,6 +43,12 @@ public class ConfigOptions {
         "coloured_category_text"
     ));
 
+    public static final ConfigOption<Boolean> ALTERNATIVE_TOOLTIPS = registerOption(new BoolOption(
+        true,
+        true,
+        "alternative_tooltips"
+    ));
+
     // behaviour
     public static final ConfigOption<Integer> COLLAPSE_THRESHOLD = registerOption(new CollapseThresholdOption(
         6,

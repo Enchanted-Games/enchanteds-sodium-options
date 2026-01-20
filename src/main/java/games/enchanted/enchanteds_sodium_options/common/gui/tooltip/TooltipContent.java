@@ -31,4 +31,16 @@ public class TooltipContent {
         }
         return Tooltip.create(tooltipContent, this.body);
     }
+
+    public @Nullable Component getPerformanceImpact() {
+        return performanceImpact;
+    }
+
+    public Component getOptionValue() {
+        return optionValue;
+    }
+
+    public Component getBody() {
+        return body;
+    }
 }

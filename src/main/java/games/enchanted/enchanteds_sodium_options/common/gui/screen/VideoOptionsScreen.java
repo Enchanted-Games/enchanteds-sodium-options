@@ -6,6 +6,8 @@ import games.enchanted.enchanteds_sodium_options.common.Logging;
 import games.enchanted.enchanteds_sodium_options.common.ModConstants;
 import games.enchanted.enchanteds_sodium_options.common.compat.iris.IrisShaderButtonBuilder;
 import games.enchanted.enchanteds_sodium_options.common.config.ConfigOptions;
+import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.TooltipContent;
+import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.TooltipRenderer;
 import games.enchanted.enchanteds_sodium_options.common.gui.widget.option.*;
 import games.enchanted.enchanteds_sodium_options.common.gui.widget.scroll.VideoOptionsList;
 import games.enchanted.enchanteds_sodium_options.common.mixin.accessor.sodium.OptionAccessor;
@@ -15,10 +17,12 @@ import net.caffeinemc.mods.sodium.client.config.structure.*;
 import net.caffeinemc.mods.sodium.client.gui.VideoSettingsScreen;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.layouts.LinearLayout;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
@@ -34,7 +38,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
-public class VideoOptionsScreen extends Screen {
+public class VideoOptionsScreen extends Screen implements TooltipRenderer {
     private static final Component TITLE = Component.translatable("options.videoTitle");
     private static final Component DONATION_BUTTON_TEXT = Component.translatable("sodium.options.buttons.donate");
     protected static final int FOOTER_BUTTON_WIDTH = 98;
@@ -52,6 +56,9 @@ public class VideoOptionsScreen extends Screen {
     @Nullable AbstractWidget shaderpacksButton;
 
     final ArrayList<OptionWidget<?>> optionWidgets = new ArrayList<>();
+    ScreenRectangle topHalfRectangle = new ScreenRectangle(0, 0, this.width, this.height / 2);
+
+    @Nullable protected TooltipRenderInfo pendingTooltip = null;
 
     protected VideoOptionsScreen(Screen parent, Component title) {
         super(title);
@@ -247,10 +254,10 @@ public class VideoOptionsScreen extends Screen {
     public AbstractWidget buildOptionWidget(Option option) {
         switch (option) {
             case BooleanOption booleanOption -> {
-                return new OnOffWidget(0, 0, booleanOption);
+                return new OnOffWidget(0, 0, booleanOption, this);
             }
             case IntegerOption integerOption -> {
-                return new IntegerSliderWidget(0, 0, integerOption);
+                return new IntegerSliderWidget(0, 0, integerOption, this);
             }
             case ExternalButtonOption externalButtonOption -> {
                 return Button.builder(option.getName(), button -> externalButtonOption.getCurrentScreenConsumer().accept(this))
@@ -258,7 +265,7 @@ public class VideoOptionsScreen extends Screen {
                     .build();
             }
             case EnumOption<?> enumOption -> {
-                return new EnumCyclerWidget<>(0, 0, enumOption);
+                return new EnumCyclerWidget<>(0, 0, enumOption, this);
             }
             default -> {
                 Logging.warn(
@@ -282,6 +289,20 @@ public class VideoOptionsScreen extends Screen {
             optionWidget.onChange(this::anyOptionChanged);
             this.optionWidgets.add(optionWidget);
         });
+    }
+
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+
+        if(this.pendingTooltip != null) {
+            boolean positionAtBottom = this.pendingTooltip.widgetRectangle().overlaps(this.topHalfRectangle);
+
+            guiGraphics.fill(0, positionAtBottom ? this.height / 2 : 0, this.width, positionAtBottom ? this.height : this.height / 2, 0x33000000);
+            guiGraphics.drawString(this.font, this.pendingTooltip.content().getOptionValue(), 0, this.height / 2, -1);
+            this.pendingTooltip = null;
+        }
     }
 
 
@@ -345,10 +366,21 @@ public class VideoOptionsScreen extends Screen {
         this.minecraft.setScreen(parent);
     }
 
+
+    @Override
+    public void submitTooltipContent(TooltipContent content, boolean force, ScreenRectangle widgetRectangle) {
+        if(!ConfigOptions.ALTERNATIVE_TOOLTIPS.getValue()) return;
+        if(this.pendingTooltip == null || force) {
+            this.pendingTooltip = new TooltipRenderInfo(content, widgetRectangle);
+        }
+    }
+
+
     @Override
     protected void repositionElements() {
         this.layout.arrangeElements();
         int headerHeight = this.layout.getHeaderHeight();
+        this.topHalfRectangle = new ScreenRectangle(0, 0, this.width, this.height / 2);
 
         if(this.shaderpacksButton != null) {
             this.shaderpacksButton.setPosition(
@@ -418,5 +450,8 @@ public class VideoOptionsScreen extends Screen {
     }
 
     protected record CollapsedPageInfo(boolean collapsed, boolean onlyPageCollapsed) {
+    }
+
+    protected record TooltipRenderInfo(TooltipContent content, ScreenRectangle widgetRectangle) {
     }
 }

@@ -1,11 +1,14 @@
 package games.enchanted.enchanteds_sodium_options.common.gui.widget.option;
 
 import games.enchanted.enchanteds_sodium_options.common.ModConstants;
+import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.AbstractWidgetPreventTooltipRender;
 import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.TooltipContent;
+import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.TooltipRenderer;
 import games.enchanted.enchanteds_sodium_options.common.gui.widget.extension.AbstractSliderButtonExtension;
 import games.enchanted.enchanteds_sodium_options.common.util.ComponentUtil;
 import net.caffeinemc.mods.sodium.api.config.option.SteppedValidator;
 import net.caffeinemc.mods.sodium.client.config.structure.IntegerOption;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.input.KeyEvent;
@@ -14,19 +17,22 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import org.jspecify.annotations.Nullable;
 
-public class IntegerSliderWidget extends AbstractSliderButton implements AbstractSliderButtonExtension, OptionWidget<IntegerOption> {
+public class IntegerSliderWidget extends AbstractSliderButton implements AbstractSliderButtonExtension, OptionWidget<IntegerOption>, AbstractWidgetPreventTooltipRender {
     private static final Identifier DISABLED_HANDLE_SPRITE = Identifier.fromNamespaceAndPath(ModConstants.MOD_ID, "widget/slider_handle_disabled");
 
     final TooltipContent tooltipContent;
+    final TooltipRenderer tooltipRenderer;
+
     final IntegerOption option;
     int realValue;
     int prevValue;
 
     @Nullable OnChange onChange = null;
 
-    public IntegerSliderWidget(int x, int y, IntegerOption option) {
+    public IntegerSliderWidget(int x, int y, IntegerOption option, TooltipRenderer tooltipRenderer) {
         super(x, y, Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, option.getName(), 0);
         this.tooltipContent = new TooltipContent(ComponentUtil.createOptionTooltip(option), this.message, ComponentUtil.createPerformanceImpact(option));
+        this.tooltipRenderer = tooltipRenderer;
         this.option = option;
         this.realValue = option.getAppliedValue();
         this.prevValue = this.realValue;
@@ -49,6 +55,14 @@ public class IntegerSliderWidget extends AbstractSliderButton implements Abstrac
         );
         this.tooltipContent.setOptionValue(this.message);
         this.setTooltip(this.tooltipContent.createTooltip());
+    }
+
+    @Override
+    public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        super.renderWidget(guiGraphics, mouseX, mouseY, partialTicks);
+        if(this.isHoveredOrFocused()) {
+            this.tooltipRenderer.submitTooltipContent(this.tooltipContent, this.isHovered(), this.getRectangle());
+        }
     }
 
     @Override
