@@ -32,7 +32,7 @@ public class SubVideoOptionsScreen extends VideoOptionsScreen {
         }
 
         ImmutableList<OptionGroup> groups = page.groups();
-        buildGroupOptions(groups, this.modInfo);
+        this.buildGroupOptions(groups, this.modInfo);
     }
 
     @Override

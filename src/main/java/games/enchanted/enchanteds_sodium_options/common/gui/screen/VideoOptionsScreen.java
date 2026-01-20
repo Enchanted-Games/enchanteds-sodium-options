@@ -79,7 +79,7 @@ public class VideoOptionsScreen extends Screen implements TooltipRenderer {
         try {
             return new VideoOptionsScreen(parent);
         } catch (Exception e) {
-            return createErrorScreen(e, parent);
+            return VideoOptionsScreen.createErrorScreen(e, parent);
         }
     }
 
@@ -118,7 +118,7 @@ public class VideoOptionsScreen extends Screen implements TooltipRenderer {
             );
             this.addRenderableWidget(this.optionsList);
 
-            buildSodiumOptionWidgets();
+            this.buildSodiumOptionWidgets();
 
             this.visitOptionsAndAddListeners();
             this.layout.visitWidgets(this::addRenderableWidget);
@@ -161,7 +161,7 @@ public class VideoOptionsScreen extends Screen implements TooltipRenderer {
                 modInfo
             );
 
-            buildPages(options.pages(), modInfo);
+            this.buildPages(options.pages(), modInfo);
         }
     }
 
@@ -220,7 +220,7 @@ public class VideoOptionsScreen extends Screen implements TooltipRenderer {
 
         if(!collapsedInfo.collapsed()) {
             this.optionsList.addCategoryHeader(page.name(), modInfo);
-            buildGroupOptions(page.groups(), modInfo);
+            this.buildGroupOptions(page.groups(), modInfo);
             return;
         }
 
@@ -308,17 +308,17 @@ public class VideoOptionsScreen extends Screen implements TooltipRenderer {
 
     @Override
     public boolean shouldCloseOnEsc() {
-        return !hasPendingChanges();
+        return !this.hasPendingChanges();
     }
 
     private void undoChanges() {
         ConfigManager.CONFIG.resetAllOptionsFromBindings();
-        refreshOptionWidgetValues();
+        this.refreshOptionWidgetValues();
     }
 
     private void saveChanges() {
         ConfigManager.CONFIG.applyAllOptions();
-        refreshOptionWidgetValues();
+        this.refreshOptionWidgetValues();
     }
 
     private boolean hasPendingChanges() {
@@ -331,13 +331,13 @@ public class VideoOptionsScreen extends Screen implements TooltipRenderer {
     }
 
     protected void anyOptionChanged() {
-        updateFooterButtonState();
+        this.updateFooterButtonState();
         this.optionWidgets.forEach(OptionWidget::refreshVisual);
     }
 
     protected void updateFooterButtonState() {
         if(this.undoButton == null || this.applyButton == null || this.doneButton == null) return;
-        if(hasPendingChanges()) {
+        if(this.hasPendingChanges()) {
             this.undoButton.active = true;
             this.applyButton.active = true;
             this.doneButton.active = false;
@@ -438,7 +438,6 @@ public class VideoOptionsScreen extends Screen implements TooltipRenderer {
                 if(confirmed) {
                     Util.getPlatform().openUri(ModConstants.ISSUE_URI);
                 } else {
-
                     Minecraft.getInstance().setScreen(VideoOptionsScreen.createSodiumScreen(parent));
                 }
             },
