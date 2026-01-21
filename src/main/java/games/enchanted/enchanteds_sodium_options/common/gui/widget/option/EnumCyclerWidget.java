@@ -51,7 +51,7 @@ public class EnumCyclerWidget<T extends Enum<T>> extends Button implements Optio
         this.renderDefaultSprite(guiGraphics);
         this.renderDefaultLabel(guiGraphics.textRendererForWidget(this, GuiGraphics.HoveredTextEffects.NONE));
         if(this.isHoveredOrFocused()) {
-            this.tooltipRenderer.submitTooltipContent(this.tooltipContent, this.isHovered(), this.getRectangle());
+            this.tooltipRenderer.submitTooltipContent(this.tooltipContent, this.isHovered(), this.isFocused(), this.getRectangle());
         }
     }
 

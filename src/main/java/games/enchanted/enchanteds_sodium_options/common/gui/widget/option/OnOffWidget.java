@@ -59,7 +59,7 @@ public class OnOffWidget extends Button implements OptionWidget<BooleanOption>, 
         }
         this.renderDefaultLabel(guiGraphics.textRendererForWidget(this, GuiGraphics.HoveredTextEffects.NONE));
         if(this.isHoveredOrFocused()) {
-            this.tooltipRenderer.submitTooltipContent(this.tooltipContent, this.isHovered(), this.getRectangle());
+            this.tooltipRenderer.submitTooltipContent(this.tooltipContent, this.isHovered(), this.isFocused(), this.getRectangle());
         }
     }
 

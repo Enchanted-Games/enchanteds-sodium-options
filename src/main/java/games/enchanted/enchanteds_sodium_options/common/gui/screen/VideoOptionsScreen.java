@@ -43,6 +43,12 @@ public class VideoOptionsScreen extends Screen implements TooltipRenderer {
     private static final Component DONATION_BUTTON_TEXT = Component.translatable("sodium.options.buttons.donate");
     protected static final int FOOTER_BUTTON_WIDTH = 98;
 
+    private static final int TOOLTIP_WIDTH = 320;
+    private static final int TOOLTIP_PADDING = 5;
+    private static final int TOOLTIP_MARGIN_INLINE = 10;
+    private static final int TOOLTIP_MARGIN_BLOCK = HeaderAndFooterLayout.DEFAULT_HEADER_AND_FOOTER_HEIGHT;
+    private static final int TOOLTIP_MAX_HEIGHT = 130;
+
     public static boolean forceSodiumScreen = false;
 
     public final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
@@ -354,9 +360,10 @@ public class VideoOptionsScreen extends Screen implements TooltipRenderer {
 
 
     @Override
-    public void submitTooltipContent(TooltipContent content, boolean force, ScreenRectangle widgetRectangle) {
+    public void submitTooltipContent(TooltipContent content, boolean hovered, boolean focused, ScreenRectangle widgetRectangle) {
         if(!ConfigOptions.ALTERNATIVE_TOOLTIPS.getValue()) return;
-        if(this.tooltipState == null || force) {
+        boolean shouldShow = hovered || focused && minecraft.getLastInputType().isKeyboard();
+        if(this.tooltipState == null && shouldShow) {
             this.tooltipState = new TooltipState(content, widgetRectangle);
         }
     }
@@ -367,14 +374,19 @@ public class VideoOptionsScreen extends Screen implements TooltipRenderer {
 
         if(this.tooltipState != null) {
             boolean positionAtBottom = this.tooltipState.widgetRectangle().overlaps(this.topHalfRectangle);
+            final int middleX = this.width / 2;
+            final int tooltipWidth = this.width <= 440 ? this.width - TOOLTIP_MARGIN_INLINE : TOOLTIP_WIDTH;
+
             this.renderCustomTooltip(
                 new TooltipRenderState(
                     this.tooltipState.content(),
-                    0,
-                    positionAtBottom ? this.height / 2 : 0,
-                    this.width,
-                    positionAtBottom ? this.height : this.height / 2
+                    middleX - (tooltipWidth / 2),
+                    positionAtBottom ? this.height - TOOLTIP_MAX_HEIGHT - TOOLTIP_MARGIN_BLOCK : TOOLTIP_MARGIN_BLOCK,
+                    tooltipWidth,
+                    TOOLTIP_MAX_HEIGHT,
+                    TOOLTIP_PADDING
                 ),
+                this.font,
                 guiGraphics,
                 mouseX,
                 mouseY,
@@ -390,7 +402,7 @@ public class VideoOptionsScreen extends Screen implements TooltipRenderer {
     protected void repositionElements() {
         this.layout.arrangeElements();
         int headerHeight = this.layout.getHeaderHeight();
-        this.topHalfRectangle = new ScreenRectangle(0, 0, this.width, (this.height / 2) - (Button.DEFAULT_HEIGHT / 2));
+        this.topHalfRectangle = new ScreenRectangle(0, 0, this.width, (this.height / 2));
 
         if(this.shaderpacksButton != null) {
             this.shaderpacksButton.setPosition(

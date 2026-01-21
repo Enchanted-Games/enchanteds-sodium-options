@@ -61,7 +61,7 @@ public class IntegerSliderWidget extends AbstractSliderButton implements Abstrac
     public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         super.renderWidget(guiGraphics, mouseX, mouseY, partialTicks);
         if(this.isHoveredOrFocused()) {
-            this.tooltipRenderer.submitTooltipContent(this.tooltipContent, this.isHovered(), this.getRectangle());
+            this.tooltipRenderer.submitTooltipContent(this.tooltipContent, this.isHovered(), this.isFocused(), this.getRectangle());
         }
     }
 
