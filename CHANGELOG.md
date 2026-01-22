@@ -9,11 +9,12 @@
 
 ## Changes
 
-- Option values now show in tooltips. Fixes issues where it was impossible to tell the value of an option if its text was too long
-- Using the arrows keys on sliders now changes the value by 1 step instead of moving the handle by 1 pixel (like the vanilla options screen)
+- The mod's version number now includes the target Sodium version
+    - For example `1.1.0+0.8.3-mc1.21.11` is ESO v1.1.0, for Sodium v0.8.3 and Minecraft 1.21.11
+- Option values are now displayed in tooltips
+    - Addresses some issues where it was difficult to tell what the value of an option was if its text was too long
+- Using the arrows keys on sliders now changes the value by 1 step instead of moving the handle by 1 pixel to match the behavior of vanillas video settings screen
 - Version numbers are now truncated in the video settings screen, hovering over it shows the full version
-- The mod's version number now includes the target sodium version
-    - For example `1.1.0+0.8.3-mc1.21.11` is ESO v1.1.0, for Sodium v0.8.3 and Minecraft 1.21.11 
 
 ## Fixes
 
