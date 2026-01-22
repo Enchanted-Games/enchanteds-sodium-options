@@ -386,7 +386,7 @@ public class VideoOptionsScreen extends Screen implements TooltipConsumer {
     }
 
     protected TooltipRenderHelper.TooltipRenderState extractTooltipRenderState(TooltipState tooltipState) {
-        final int width = this.width <= 440 ? this.width - TOOLTIP_SPACE_MARGIN_INLINE : TOOLTIP_WIDTH;
+        final int width = Math.min(this.width - TOOLTIP_SPACE_MARGIN_INLINE, TOOLTIP_WIDTH);
         final int height = TooltipRenderHelper.calculateHeight(tooltipState.content(), this.font, width, TOOLTIP_PADDING);
 
         final var rectangle = tooltipState.widgetRectangle();
