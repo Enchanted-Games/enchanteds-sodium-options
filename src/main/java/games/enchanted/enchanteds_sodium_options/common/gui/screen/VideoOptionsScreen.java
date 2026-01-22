@@ -83,7 +83,9 @@ public class VideoOptionsScreen extends Screen implements TooltipConsumer {
 
     public static Screen create(Screen parent) {
         try {
-            return new VideoOptionsScreen(parent);
+            Screen screen = new VideoOptionsScreen(parent);
+            ConfigManager.CONFIG.resetAllOptionsFromBindings();
+            return screen;
         } catch (Exception e) {
             return VideoOptionsScreen.createErrorScreen(e, parent);
         }
@@ -92,6 +94,8 @@ public class VideoOptionsScreen extends Screen implements TooltipConsumer {
     @Override
     protected void init() {
         try {
+            ConfigManager.CONFIG.invalidateGlobalRebuildDependents();
+
             this.layout.addTitleHeader(this.title, this.font);
             int headerHeight = this.layout.getHeaderHeight();
 
@@ -292,7 +296,7 @@ public class VideoOptionsScreen extends Screen implements TooltipConsumer {
         if(this.optionsList == null) return;
         this.optionsList.visitChildren(widget -> {
             if(!(widget instanceof OptionWidget<?> optionWidget)) return;
-            optionWidget.onChange(this::anyOptionChanged);
+            optionWidget.onChange(this::refreshOptionWidgetVisuals);
             this.optionWidgets.add(optionWidget);
         });
     }
@@ -313,7 +317,7 @@ public class VideoOptionsScreen extends Screen implements TooltipConsumer {
         this.refreshOptionWidgetValues();
     }
 
-    private boolean hasPendingChanges() {
+    protected boolean hasPendingChanges() {
         return ConfigManager.CONFIG.anyOptionChanged();
     }
 
@@ -322,9 +326,9 @@ public class VideoOptionsScreen extends Screen implements TooltipConsumer {
         this.updateFooterButtonState();
     }
 
-    protected void anyOptionChanged() {
-        this.updateFooterButtonState();
+    protected void refreshOptionWidgetVisuals() {
         this.optionWidgets.forEach(OptionWidget::refreshVisual);
+        this.updateFooterButtonState();
     }
 
     protected void updateFooterButtonState() {
@@ -443,6 +447,8 @@ public class VideoOptionsScreen extends Screen implements TooltipConsumer {
             );
             this.optionsList.repositionElements();
         }
+
+        this.refreshOptionWidgetVisuals();
     }
 
     public static Screen createErrorScreen(@Nullable Exception e, Screen parent) {

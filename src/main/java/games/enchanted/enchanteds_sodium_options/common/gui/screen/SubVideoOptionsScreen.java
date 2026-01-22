@@ -36,9 +36,17 @@ public class SubVideoOptionsScreen extends VideoOptionsScreen {
     }
 
     @Override
+    protected void updateFooterButtonState() {
+        super.updateFooterButtonState();
+        if(this.doneButton != null) {
+            this.doneButton.active = true;
+        }
+    }
+
+    @Override
     public void onClose() {
         super.onClose();
-        this.videoParent.anyOptionChanged();
+        this.videoParent.refreshOptionWidgetVisuals();
     }
 
     @Override
