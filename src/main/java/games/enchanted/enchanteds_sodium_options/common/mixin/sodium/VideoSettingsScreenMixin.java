@@ -3,7 +3,7 @@ package games.enchanted.enchanteds_sodium_options.common.mixin.sodium;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Cancellable;
-import games.enchanted.enchanteds_sodium_options.common.gui.screen.VideoOptionsScreen;
+import games.enchanted.enchanteds_sodium_options.common.gui.screen.EnchantedSodiumOptionsScreen;
 import net.caffeinemc.mods.sodium.client.gui.SodiumOptions;
 import net.caffeinemc.mods.sodium.client.gui.VideoSettingsScreen;
 import net.minecraft.client.gui.screens.Screen;
@@ -24,9 +24,9 @@ public abstract class VideoSettingsScreenMixin extends Screen {
     )
     private static boolean wrapSodiumVideoScreenCtor(SodiumOptions instance, Operation<Boolean> original, Screen currentScreen, @Cancellable CallbackInfoReturnable<Screen> cir) {
         boolean configReadOnly = original.call(instance);
-        if(VideoOptionsScreen.forceSodiumScreen) return configReadOnly;
+        if(EnchantedSodiumOptionsScreen.forceSodiumScreen) return configReadOnly;
         if(!configReadOnly) {
-            cir.setReturnValue(VideoOptionsScreen.create(currentScreen));
+            cir.setReturnValue(EnchantedSodiumOptionsScreen.create(currentScreen));
             return false;
         }
         return true;

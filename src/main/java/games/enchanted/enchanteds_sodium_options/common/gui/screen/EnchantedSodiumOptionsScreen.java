@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
-public class VideoOptionsScreen extends Screen implements TooltipConsumer {
+public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsumer {
     private static final Component TITLE = Component.translatable("options.videoTitle");
     private static final Component DONATION_BUTTON_TEXT = Component.translatable("sodium.options.buttons.donate");
     protected static final int FOOTER_BUTTON_WIDTH = 98;
@@ -66,11 +66,11 @@ public class VideoOptionsScreen extends Screen implements TooltipConsumer {
     ScreenRectangle topHalfRectangle = new ScreenRectangle(0, 0, 0, 0);
     @Nullable protected TooltipState tooltipState = null;
 
-    protected VideoOptionsScreen(Screen parent, Component title) {
+    protected EnchantedSodiumOptionsScreen(Screen parent, Component title) {
         super(title);
         this.parent = parent;
     }
-    protected VideoOptionsScreen(Screen parent) {
+    protected EnchantedSodiumOptionsScreen(Screen parent) {
         this(parent, TITLE);
     }
 
@@ -83,11 +83,11 @@ public class VideoOptionsScreen extends Screen implements TooltipConsumer {
 
     public static Screen create(Screen parent) {
         try {
-            Screen screen = new VideoOptionsScreen(parent);
+            Screen screen = new EnchantedSodiumOptionsScreen(parent);
             ConfigManager.CONFIG.resetAllOptionsFromBindings();
             return screen;
         } catch (Exception e) {
-            return VideoOptionsScreen.createErrorScreen(e, parent);
+            return EnchantedSodiumOptionsScreen.createErrorScreen(e, parent);
         }
     }
 
@@ -235,7 +235,7 @@ public class VideoOptionsScreen extends Screen implements TooltipConsumer {
         }
 
         AbstractWidget subPageButton = Button.builder(ComponentUtil.appendEllipsis(page.name()), button -> {
-            this.minecraft.setScreen(new SubVideoOptionsScreen(page, this, modInfo));
+            this.minecraft.setScreen(new SubOptionsScreen(page, this, modInfo));
         }).build();
 
         if(collapsedInfo.onlyPageCollapsed()) {
@@ -482,7 +482,7 @@ public class VideoOptionsScreen extends Screen implements TooltipConsumer {
                 if(confirmed) {
                     Util.getPlatform().openUri(ModConstants.ISSUE_URI);
                 } else {
-                    Minecraft.getInstance().setScreen(VideoOptionsScreen.createSodiumScreen(parent));
+                    Minecraft.getInstance().setScreen(EnchantedSodiumOptionsScreen.createSodiumScreen(parent));
                 }
             },
             ComponentUtil.MOD_NAME,

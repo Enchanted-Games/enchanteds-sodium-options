@@ -8,12 +8,12 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.CommonComponents;
 
-public class SubVideoOptionsScreen extends VideoOptionsScreen {
-    final VideoOptionsScreen videoParent;
+public class SubOptionsScreen extends EnchantedSodiumOptionsScreen {
+    final EnchantedSodiumOptionsScreen videoParent;
     final OptionPage page;
     final VideoOptionsList.ModInfo modInfo;
 
-    public SubVideoOptionsScreen(OptionPage page, VideoOptionsScreen parent, VideoOptionsList.ModInfo modInfo) {
+    public SubOptionsScreen(OptionPage page, EnchantedSodiumOptionsScreen parent, VideoOptionsList.ModInfo modInfo) {
         super(parent, page.name());
         this.videoParent = parent;
         this.page = page;
