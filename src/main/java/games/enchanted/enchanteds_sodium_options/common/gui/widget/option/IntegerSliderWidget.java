@@ -3,7 +3,7 @@ package games.enchanted.enchanteds_sodium_options.common.gui.widget.option;
 import games.enchanted.enchanteds_sodium_options.common.ModConstants;
 import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.AbstractWidgetPreventTooltipRender;
 import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.TooltipContent;
-import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.TooltipRenderer;
+import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.TooltipConsumer;
 import games.enchanted.enchanteds_sodium_options.common.gui.widget.extension.AbstractSliderButtonExtension;
 import games.enchanted.enchanteds_sodium_options.common.util.ComponentUtil;
 import net.caffeinemc.mods.sodium.api.config.option.SteppedValidator;
@@ -21,7 +21,7 @@ public class IntegerSliderWidget extends AbstractSliderButton implements Abstrac
     private static final Identifier DISABLED_HANDLE_SPRITE = Identifier.fromNamespaceAndPath(ModConstants.MOD_ID, "widget/slider_handle_disabled");
 
     final TooltipContent tooltipContent;
-    final TooltipRenderer tooltipRenderer;
+    final TooltipConsumer tooltipConsumer;
 
     final IntegerOption option;
     int realValue;
@@ -29,10 +29,10 @@ public class IntegerSliderWidget extends AbstractSliderButton implements Abstrac
 
     @Nullable OnChange onChange = null;
 
-    public IntegerSliderWidget(int x, int y, IntegerOption option, TooltipRenderer tooltipRenderer) {
+    public IntegerSliderWidget(int x, int y, IntegerOption option, TooltipConsumer tooltipConsumer) {
         super(x, y, Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, option.getName(), 0);
         this.tooltipContent = new TooltipContent(ComponentUtil.createOptionTooltip(option), this.message, ComponentUtil.createPerformanceImpact(option));
-        this.tooltipRenderer = tooltipRenderer;
+        this.tooltipConsumer = tooltipConsumer;
         this.option = option;
         this.realValue = option.getAppliedValue();
         this.prevValue = this.realValue;
@@ -61,7 +61,7 @@ public class IntegerSliderWidget extends AbstractSliderButton implements Abstrac
     public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         super.renderWidget(guiGraphics, mouseX, mouseY, partialTicks);
         if(this.isHoveredOrFocused()) {
-            this.tooltipRenderer.submitTooltipContent(this.tooltipContent, this.isHovered(), this.isFocused(), this.getRectangle());
+            this.tooltipConsumer.submitTooltipContent(this.tooltipContent, this.isHovered(), this.isFocused(), this.getRectangle());
         }
     }
 

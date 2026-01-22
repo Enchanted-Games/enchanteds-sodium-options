@@ -6,8 +6,9 @@ import games.enchanted.enchanteds_sodium_options.common.Logging;
 import games.enchanted.enchanteds_sodium_options.common.ModConstants;
 import games.enchanted.enchanteds_sodium_options.common.compat.iris.IrisShaderButtonBuilder;
 import games.enchanted.enchanteds_sodium_options.common.config.ConfigOptions;
+import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.TooltipConsumer;
 import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.TooltipContent;
-import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.TooltipRenderer;
+import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.TooltipRenderHelper;
 import games.enchanted.enchanteds_sodium_options.common.gui.widget.option.*;
 import games.enchanted.enchanteds_sodium_options.common.gui.widget.scroll.VideoOptionsList;
 import games.enchanted.enchanteds_sodium_options.common.mixin.accessor.sodium.OptionAccessor;
@@ -38,16 +39,15 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
-public class VideoOptionsScreen extends Screen implements TooltipRenderer {
+public class VideoOptionsScreen extends Screen implements TooltipConsumer {
     private static final Component TITLE = Component.translatable("options.videoTitle");
     private static final Component DONATION_BUTTON_TEXT = Component.translatable("sodium.options.buttons.donate");
     protected static final int FOOTER_BUTTON_WIDTH = 98;
 
     private static final int TOOLTIP_WIDTH = 320;
-    private static final int TOOLTIP_PADDING = 5;
-    private static final int TOOLTIP_MARGIN_INLINE = 10;
-    private static final int TOOLTIP_MARGIN_BLOCK = HeaderAndFooterLayout.DEFAULT_HEADER_AND_FOOTER_HEIGHT;
-    private static final int TOOLTIP_MAX_HEIGHT = 130;
+    private static final int TOOLTIP_PADDING = 4;
+    private static final int TOOLTIP_SPACE_MARGIN_INLINE = 10;
+    private static final int TOOLTIP_SPACE_MARGIN_BLOCK = HeaderAndFooterLayout.DEFAULT_HEADER_AND_FOOTER_HEIGHT;
 
     public static boolean forceSodiumScreen = false;
 
@@ -373,19 +373,8 @@ public class VideoOptionsScreen extends Screen implements TooltipRenderer {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
 
         if(this.tooltipState != null) {
-            boolean positionAtBottom = this.tooltipState.widgetRectangle().overlaps(this.topHalfRectangle);
-            final int middleX = this.width / 2;
-            final int tooltipWidth = this.width <= 440 ? this.width - TOOLTIP_MARGIN_INLINE : TOOLTIP_WIDTH;
-
-            this.renderCustomTooltip(
-                new TooltipRenderState(
-                    this.tooltipState.content(),
-                    middleX - (tooltipWidth / 2),
-                    positionAtBottom ? this.height - TOOLTIP_MAX_HEIGHT - TOOLTIP_MARGIN_BLOCK : TOOLTIP_MARGIN_BLOCK,
-                    tooltipWidth,
-                    TOOLTIP_MAX_HEIGHT,
-                    TOOLTIP_PADDING
-                ),
+            TooltipRenderHelper.renderTooltip(
+                this.extractTooltipRenderState(this.tooltipState),
                 this.font,
                 guiGraphics,
                 mouseX,
@@ -395,6 +384,34 @@ public class VideoOptionsScreen extends Screen implements TooltipRenderer {
 
             this.tooltipState = null;
         }
+    }
+
+    protected TooltipRenderHelper.TooltipRenderState extractTooltipRenderState(TooltipState tooltipState) {
+        final int width = this.width <= 440 ? this.width - TOOLTIP_SPACE_MARGIN_INLINE : TOOLTIP_WIDTH;
+        final int height = TooltipRenderHelper.calculateHeight(tooltipState.content(), this.font, width, TOOLTIP_PADDING);
+
+        final var rectangle = tooltipState.widgetRectangle();
+        final int tooltipAreaBottom = (this.height - TOOLTIP_SPACE_MARGIN_BLOCK);
+
+        // align to top if overflowing the bottom of the screen
+        int y = rectangle.bottom() + height > tooltipAreaBottom ?
+            Math.max(TOOLTIP_SPACE_MARGIN_BLOCK, rectangle.top() - height - (TOOLTIP_PADDING * 2)) :
+            rectangle.bottom()
+        ;
+
+        // last resort if still overflowing
+        if(y + height > tooltipAreaBottom) {
+            y = 0;
+        }
+
+        return new TooltipRenderHelper.TooltipRenderState(
+            tooltipState.content(),
+            (this.width / 2) - (width / 2),
+            y,
+            width,
+            height,
+            TOOLTIP_PADDING
+        );
     }
 
 

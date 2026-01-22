@@ -2,7 +2,7 @@ package games.enchanted.enchanteds_sodium_options.common.gui.widget.option;
 
 import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.AbstractWidgetPreventTooltipRender;
 import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.TooltipContent;
-import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.TooltipRenderer;
+import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.TooltipConsumer;
 import games.enchanted.enchanteds_sodium_options.common.util.ComponentUtil;
 import net.caffeinemc.mods.sodium.client.config.structure.BooleanOption;
 import net.minecraft.client.gui.GuiGraphics;
@@ -18,17 +18,17 @@ public class OnOffWidget extends Button implements OptionWidget<BooleanOption>, 
     private static final Identifier DISABLED_SPRITE = Identifier.withDefaultNamespace("widget/button_disabled");
 
     final TooltipContent tooltipContent;
-    final TooltipRenderer tooltipRenderer;
+    final TooltipConsumer tooltipConsumer;
 
     final BooleanOption option;
     boolean value;
 
     @Nullable OnChange onChange = null;
 
-    public OnOffWidget(int x, int y, BooleanOption option, TooltipRenderer tooltipRenderer) {
+    public OnOffWidget(int x, int y, BooleanOption option, TooltipConsumer tooltipConsumer) {
         super(x, y, Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, option.getName(), (button) -> {}, DEFAULT_NARRATION);
         this.tooltipContent = new TooltipContent(ComponentUtil.createOptionTooltip(option), this.message, ComponentUtil.createPerformanceImpact(option));
-        this.tooltipRenderer = tooltipRenderer;
+        this.tooltipConsumer = tooltipConsumer;
         this.option = option;
         this.value = option.getValidatedValue();
         updateMessage();
@@ -59,7 +59,7 @@ public class OnOffWidget extends Button implements OptionWidget<BooleanOption>, 
         }
         this.renderDefaultLabel(guiGraphics.textRendererForWidget(this, GuiGraphics.HoveredTextEffects.NONE));
         if(this.isHoveredOrFocused()) {
-            this.tooltipRenderer.submitTooltipContent(this.tooltipContent, this.isHovered(), this.isFocused(), this.getRectangle());
+            this.tooltipConsumer.submitTooltipContent(this.tooltipContent, this.isHovered(), this.isFocused(), this.getRectangle());
         }
     }
 
