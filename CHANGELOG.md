@@ -19,3 +19,4 @@
 ## Fixes
 
 - Fixed some mods appearing in the video settings screen despite having no options. This happened when a mod registered an option overlay but no other options with Sodiums config api
+- The 'Back' button can now always be pressed in sub-menus in the video settings screen
