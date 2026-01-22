@@ -27,28 +27,24 @@ public class TooltipContent {
         this.optionValue = value;
     }
 
-    public Tooltip createTooltip() {
-        MutableComponent tooltipContent = Component.empty()
-            .append(this.optionValue.copy().withColor(0xd8d8da))
-            .append("\n\n")
-            .append(this.body)
-        ;
-        if(this.performanceImpact != null) {
-            tooltipContent.append("\n\n").append(this.performanceImpact);
-        }
-        return Tooltip.create(tooltipContent, this.body);
-    }
-
     public @Nullable Component getPerformanceImpact() {
-        return performanceImpact;
+        return this.performanceImpact;
     }
 
     public Component getOptionValue() {
-        return optionValue;
+        return this.optionValue;
     }
 
     public Component getBody() {
-        return body;
+        return this.body;
+    }
+
+    public Tooltip tooltipForNarration() {
+        MutableComponent message = this.body.copy();
+        if(this.performanceImpact != null) message
+            .append("\n")
+            .append(this.performanceImpact);
+        return Tooltip.create(message);
     }
 
     public List<FormattedCharSequence> getSplitBody(Font font, int width) {

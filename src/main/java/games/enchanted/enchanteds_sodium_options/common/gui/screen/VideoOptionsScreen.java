@@ -361,7 +361,6 @@ public class VideoOptionsScreen extends Screen implements TooltipConsumer {
 
     @Override
     public void submitTooltipContent(TooltipContent content, boolean hovered, boolean focused, ScreenRectangle widgetRectangle) {
-        if(!ConfigOptions.ALTERNATIVE_TOOLTIPS.getValue()) return;
         boolean shouldShow = hovered || focused && minecraft.getLastInputType().isKeyboard();
         if(this.tooltipState == null && shouldShow) {
             this.tooltipState = new TooltipState(content, widgetRectangle);

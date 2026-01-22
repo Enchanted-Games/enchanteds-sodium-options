@@ -26,8 +26,7 @@ public class SodiumConfigEntry implements ConfigEntryPoint {
                     ConfigOptions.ACCENT_BARS,
                     ConfigOptions.SHOW_MOD_ICONS,
                     ConfigOptions.COLOURED_HEADER_TEXT,
-                    ConfigOptions.COLOURED_CATEGORY_TEXT,
-                    ConfigOptions.ALTERNATIVE_TOOLTIPS
+                    ConfigOptions.COLOURED_CATEGORY_TEXT
                 )))
             )
             .addPage(builder.createOptionPage()

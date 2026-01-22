@@ -43,7 +43,7 @@ public class EnumCyclerWidget<T extends Enum<T>> extends Button implements Optio
             this.option.hasChanged()
         );
         this.tooltipContent.setOptionValue(this.message);
-        this.setTooltip(this.tooltipContent.createTooltip());
+        this.setTooltip(this.tooltipContent.tooltipForNarration());
     }
 
     @Override
