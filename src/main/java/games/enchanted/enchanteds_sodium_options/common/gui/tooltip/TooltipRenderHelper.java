@@ -15,6 +15,7 @@ import java.util.List;
 
 public class TooltipRenderHelper {
     static final Identifier TOOLTIP_BACKGROUND = Identifier.fromNamespaceAndPath(ModConstants.MOD_ID, "tooltip/background");
+    static final int BODY_COLOUR = 0xffd8d8da;
 
     public static void renderTooltip(TooltipRenderState state, Font font, GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         List<FormattedCharSequence> bodyLines = state.content().getSplitBody(font, state.width() - (state.padding() * 2));
@@ -55,7 +56,7 @@ public class TooltipRenderHelper {
                 line,
                 state.x() + state.padding(),
                 state.y() + state.padding() + valueHeight + (font.lineHeight * i),
-                -1
+                BODY_COLOUR
             );
 
             // performance impact
