@@ -16,7 +16,7 @@
   "gui.enchanted_sodium_options.option.collapse_threshold.value.collapse_all": "Collapse All",
   "gui.enchanted_sodium_options.option.collapse_threshold.tooltip": "The maximum amount of options a config category can have before its contents are collapsed into a sub-menu.\nThis does not apply until you close and re-open the video settings screen.",
   "gui.enchanted_sodium_options.option.collapse_sodium_options": "Collapse Sodium Options",
-  "gui.enchanted_sodium_options.option.collapse_sodium_options.tooltip": "Whether Sodium's options be collapsed into a submenu if the collapse threshold is met.\nThis does not apply until you close and re-open the video settings screen.",
+  "gui.enchanted_sodium_options.option.collapse_sodium_options.tooltip": "Whether Sodium's options should be collapsed into a submenu if the collapse threshold is met.\nThis does not apply until you close and re-open the video settings screen.",
 
   "gui.enchanted_sodium_options.group.more": "More",
 
