@@ -163,7 +163,6 @@ publishMods {
     // one of BETA, ALPHA, STABLE
     type = STABLE
     displayName = "[NF] v${property("mod.version")} for mc ${stonecutter.current.version}"
-    version = "${property("mod.version")}+${property("deps.minecraft")}-neoforge"
     changelog = provider { rootProject.file("CHANGELOG.md").readText() }
     modLoaders.add("neoforge")
 

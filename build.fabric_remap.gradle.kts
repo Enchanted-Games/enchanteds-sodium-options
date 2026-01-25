@@ -173,7 +173,6 @@ publishMods {
     // one of BETA, ALPHA, STABLE
     type = STABLE
     displayName = "[Fabric] v${property("mod.version")} for mc ${stonecutter.current.version}"
-    version = "${property("mod.version")}+${property("deps.minecraft")}-fabric"
     changelog = provider { rootProject.file("CHANGELOG.md").readText() }
     modLoaders.add("fabric")
 
