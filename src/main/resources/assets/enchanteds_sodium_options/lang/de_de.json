@@ -1,0 +1,35 @@
+{
+  "gui.enchanted_sodium_options.name": "Enchanted's Sodium Options",
+
+  "gui.enchanted_sodium_options.group.visual": "Visuell",
+  "gui.enchanted_sodium_options.option.accent_bars": "Akzentfarben Leisten",
+  "gui.enchanted_sodium_options.option.accent_bars.tooltip": "Wenn aktiviert, wird links neben den Optionen für jede Mod eine farbige Leiste angezeigt.",
+  "gui.enchanted_sodium_options.option.show_mod_icons": "Mod Icons anzeigen",
+  "gui.enchanted_sodium_options.option.show_mod_icons.tooltip": "Legt fest, ob Mod Icons im Konfigurationsmenü angezeigt werden sollen.",
+  "gui.enchanted_sodium_options.option.coloured_header_text": "Farbige Mod Titel",
+  "gui.enchanted_sodium_options.option.coloured_header_text.tooltip": "Wenn aktiviert, werden die Akzentfarben der Mods für die Mod Titel im Konfigurationsmenü verwendet.",
+  "gui.enchanted_sodium_options.option.coloured_category_text": "Farbige Kategorie Titel",
+  "gui.enchanted_sodium_options.option.coloured_category_text.tooltip": "Wenn aktiviert, werden die Akzentfarben der Mods für die Titel der Konfigurationskategorien verwendet.",
+
+  "gui.enchanted_sodium_options.group.behaviour": "Verhalten",
+  "gui.enchanted_sodium_options.option.collapse_threshold": "Einklapp Schwellenwert",
+  "gui.enchanted_sodium_options.option.collapse_threshold.value.collapse_all": "Alle einklappen",
+  "gui.enchanted_sodium_options.option.collapse_threshold.tooltip": "Die maximale Anzahl an Optionen, die eine Konfigurationskategorie haben darf, bevor ihr Inhalt in ein Untermenü eingeklappt wird.\n\nDies wird erst wirksam, wenn Sie das Grafikeinstellungs Menü schließen und erneut öffnen.",
+  "gui.enchanted_sodium_options.option.collapse_sodium_options": "Sodium Optionen einklappen",
+  "gui.enchanted_sodium_options.option.collapse_sodium_options.tooltip": "Legt fest, ob die Optionen von Sodium in ein Untermenü eingeklappt werden sollen, wenn der Schwellenwert erreicht ist.\n\nDies wird erst wirksam, wenn Sie das Grafikeinstellungs Menü schließen und erneut öffnen.",
+
+  "gui.enchanted_sodium_options.group.more": "Mehr",
+
+  "gui.enchanted_sodium_options.unknown_option": "Unbekannt: %s",
+  "gui.enchanted_sodium_options.unknown_option.tooltip.1": "Melden Sie dies bei Enchanted's Sodium Options! Melden Sie dieses Problem nicht bei Sodium, %s oder einer anderen Mod!",
+  "gui.enchanted_sodium_options.unknown_option.tooltip.2": "Die Option '%s' konnte von Enchanted's Sodium Options nicht angezeigt werden.\nOptionstyp: '%s'",
+
+  "gui.enchanted_sodium_options.error_screen.body.1": "Beim Versuch, das Grafikeinstellungs Menü anzuzeigen, ist ein schwerwiegender Fehler aufgetreten.",
+  "gui.enchanted_sodium_options.error_screen.body.2": "Dies ist ein Problem mit Enchanted's Sodium Options. Bitte erstellen Sie eine Fehlermeldung, indem Sie auf die Schaltfläche unten klicken!",
+  "gui.enchanted_sodium_options.error_screen.body.3": "Melden Sie dies NICHT an die Entwickler:innen von Sodium!",
+  "gui.enchanted_sodium_options.report_button": "Fehler melden",
+  "gui.enchanted_sodium_options.sodium_screen": "Weiter zum Sodium Menü",
+
+  "gui.enchanted_sodium_options.ellipsis": "%s...",
+  "gui.enchanted_sodium_options.version": "v%s"
+}
