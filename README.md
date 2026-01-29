@@ -18,6 +18,9 @@ Enchanted's Sodium Options replaces Sodium's video settings screen with one that
 - This mod will not be backported to previous versions of Minecraft or Sodium due to Sodium lacking a proper config api in versions before `0.8`
 - Forks of Sodium won't be supported by this mod
 
+## Translations
+- This mod has been translated to some languages, [See full list and credits here!](https://github.com/Enchanted-Games/enchanteds-sodium-options/blob/meta/TRANSLATORS.md)
+
 ## License
 <p xmlns:cc="http://creativecommons.org/ns#" >Enchanted's Sodium Options by <a rel="cc:attributionURL dct:creator" property="cc:attributionName" href="https://enchanted.games">ioblackshaw (a.k.a. Enchanted_Games)</a> is licensed under <a href="http://creativecommons.org/licenses/by-nc/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">CC BY-NC 4.0</a></p> 
 Video content creators may monetise videos including this work provided the license is followed.
