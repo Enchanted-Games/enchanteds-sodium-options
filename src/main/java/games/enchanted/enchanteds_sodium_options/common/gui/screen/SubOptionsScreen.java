@@ -1,6 +1,7 @@
 package games.enchanted.enchanteds_sodium_options.common.gui.screen;
 
 import com.google.common.collect.ImmutableList;
+import games.enchanted.enchanteds_sodium_options.common.gui.widget.option.OptionWidget;
 import games.enchanted.enchanteds_sodium_options.common.gui.widget.scroll.VideoOptionsList;
 import net.caffeinemc.mods.sodium.client.config.structure.OptionGroup;
 import net.caffeinemc.mods.sodium.client.config.structure.OptionPage;
@@ -41,6 +42,18 @@ public class SubOptionsScreen extends EnchantedSodiumOptionsScreen {
         if(this.doneButton != null) {
             this.doneButton.active = true;
         }
+    }
+
+    @Override
+    protected void refreshOptionWidgetValues() {
+        super.refreshOptionWidgetValues();
+        this.videoParent.refreshOptionWidgetValues();
+    }
+
+    @Override
+    protected void refreshOptionWidgetVisuals() {
+        super.refreshOptionWidgetVisuals();
+        this.videoParent.refreshOptionWidgetVisuals();
     }
 
     @Override

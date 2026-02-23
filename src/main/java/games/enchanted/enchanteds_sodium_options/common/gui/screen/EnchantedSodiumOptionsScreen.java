@@ -321,7 +321,7 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
         return ConfigManager.CONFIG.anyOptionChanged();
     }
 
-    private void refreshOptionWidgetValues() {
+    protected void refreshOptionWidgetValues() {
         this.optionWidgets.forEach(OptionWidget::refreshValue);
         this.updateFooterButtonState();
     }
