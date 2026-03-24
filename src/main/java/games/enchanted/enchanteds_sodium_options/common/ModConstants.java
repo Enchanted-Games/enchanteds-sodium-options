@@ -10,9 +10,9 @@ public class ModConstants {
 
     public static final String TARGET_PLATFORM =
     //? if fabric {
-        /*"fabric"
-    *///?} else {
-        "neoforge"
-     //?}
+        "fabric"
+    //?} else {
+        /*"neoforge"
+     *///?}
     ;
 }

@@ -1,13 +1,13 @@
 package games.enchanted.enchanteds_sodium_options.common;
 
 //? if neoforge {
-import net.neoforged.fml.ModList;
+/*import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.fml.loading.LoadingModList;
-//?} else {
-/*import net.fabricmc.loader.api.FabricLoader;
-*///?}
+*///?} else {
+import net.fabricmc.loader.api.FabricLoader;
+//?}
 
 import java.nio.file.Path;
 
@@ -20,10 +20,10 @@ public class PlatformHelper {
      */
     public static boolean isModLoaded(String modId) {
         //? if fabric {
-        /*return FabricLoader.getInstance().isModLoaded(modId);
-        *///?} else {
-        return ModList.get().isLoaded(modId);
-         //?}
+        return FabricLoader.getInstance().isModLoaded(modId);
+        //?} else {
+        /*return ModList.get().isLoaded(modId);
+         *///?}
     }
 
     /**
@@ -34,11 +34,11 @@ public class PlatformHelper {
      */
     public static boolean isModLoadedEarly(String modId) {
         //? if fabric {
-        /*return FabricLoader.getInstance().isModLoaded(modId);
-        *///?} else {
-        LoadingModList modList = FMLLoader.getCurrent().getLoadingModList();
+        return FabricLoader.getInstance().isModLoaded(modId);
+        //?} else {
+        /*LoadingModList modList = FMLLoader.getCurrent().getLoadingModList();
         return modList.getModFiles().contains(modList.getModFileById(modId));
-        //?}
+        *///?}
     }
 
     /**
@@ -48,14 +48,14 @@ public class PlatformHelper {
      */
     public static boolean isDevelopmentEnvironment() {
         //? if fabric {
-        /*return FabricLoader.getInstance().isDevelopmentEnvironment();
-        *///?} else {
-        //? if minecraft: <= 1.21.8 {
-        /*return !FMLLoader.isProduction();
-        *///?} else {
+        return FabricLoader.getInstance().isDevelopmentEnvironment();
+        //?} else {
+        /*//? if minecraft: <= 1.21.8 {
+        /^return !FMLLoader.isProduction();
+        ^///?} else {
         return !FMLLoader.getCurrent().isProduction();
         //?}
-         //?}
+         *///?}
     }
 
     /**
@@ -72,9 +72,9 @@ public class PlatformHelper {
      */
     public static Path getConfigPath() {
         //? if fabric {
-        /*return FabricLoader.getInstance().getConfigDir();
-        *///?} else {
-        return FMLPaths.CONFIGDIR.get();
-         //?}
+        return FabricLoader.getInstance().getConfigDir();
+        //?} else {
+        /*return FMLPaths.CONFIGDIR.get();
+         *///?}
     }
 }
