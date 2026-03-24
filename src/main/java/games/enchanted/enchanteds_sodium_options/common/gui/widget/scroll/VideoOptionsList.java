@@ -5,7 +5,7 @@ import games.enchanted.enchanteds_sodium_options.common.util.ComponentUtil;
 import net.caffeinemc.mods.sodium.client.gui.ColorTheme;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
@@ -19,7 +19,6 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
 public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptionsList.Entry> {
@@ -116,10 +115,10 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
     }
 
     @Override
-    protected void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int mouseX, int mouseY, float partialTick) {
         boolean notInWorld = Minecraft.getInstance().level == null;
 
-        guiGraphics.blit(
+        GuiGraphicsExtractor.blit(
             RenderPipelines.GUI_TEXTURED,
             notInWorld ? LIST_BACKGROUND : INWORLD_LIST_BACKGROUND,
             this.getX(),
@@ -137,7 +136,7 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
         int separatorHeight = 2;
 
         Identifier headerSeparator = notInWorld ? Screen.HEADER_SEPARATOR : Screen.INWORLD_HEADER_SEPARATOR;
-        guiGraphics.blit(
+        GuiGraphicsExtractor.blit(
             RenderPipelines.GUI_TEXTURED,
             headerSeparator,
             this.getX(),
@@ -150,7 +149,7 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
             separatorHeight
         );
         Identifier footerSeparator = notInWorld ? Screen.FOOTER_SEPARATOR : Screen.INWORLD_FOOTER_SEPARATOR;
-        guiGraphics.blit(
+        GuiGraphicsExtractor.blit(
             RenderPipelines.GUI_TEXTURED,
             footerSeparator,
             this.getX(),
@@ -163,10 +162,10 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
             separatorHeight
         );
 
-        renderScrollbarIcons(guiGraphics, mouseX, mouseY, partialTick);
+        renderScrollbarIcons(GuiGraphicsExtractor, mouseX, mouseY, partialTick);
     }
 
-    protected void renderScrollbarIcons(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderScrollbarIcons(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
         // TODO: implement this properly
 //        if(this.modCategoryTitlePositions.isEmpty()) return;
 //
@@ -223,7 +222,7 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
         }
 
         @Override
-        public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
+        public void extractContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
             if(!ConfigOptions.ACCENT_BARS.getValue()) return;
             graphics.fill(
                 this.getX() - ACCENT_LEFT_OFFSET - 1,
@@ -292,17 +291,17 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
         }
 
         @Override
-        public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
-            super.renderContent(graphics, mouseX, mouseY, hovered, partialTick);
+        public void extractContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
+            super.extractContent(graphics, mouseX, mouseY, hovered, partialTick);
 
             this.child.setX(this.getContentX());
             this.child.setY(this.getContentYMiddle() - this.child.getHeight() / 2);
-            this.child.render(graphics, mouseX, mouseY, partialTick);
+            this.child.extractRenderState(graphics, mouseX, mouseY, partialTick);
 
             if(this.secondChild == null) return;
             this.secondChild.setX(this.getContentRight() - this.secondChild.getWidth());
             this.secondChild.setY(this.getContentYMiddle() - this.secondChild.getHeight() / 2);
-            this.secondChild.render(graphics, mouseX, mouseY, partialTick);
+            this.secondChild.extractRenderState(graphics, mouseX, mouseY, partialTick);
         }
 
         @Override
@@ -360,8 +359,8 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
         }
 
         @Override
-        public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
-            super.renderContent(graphics, mouseX, mouseY, hovered, partialTick);
+        public void extractContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
+            super.extractContent(graphics, mouseX, mouseY, hovered, partialTick);
             final boolean hasIcon = this.icon != null && ConfigOptions.SHOW_MOD_ICONS.getValue();
 
             final int iconSize = hasIcon ? (int) (this.font.lineHeight * 1.5) : 0;
@@ -386,11 +385,11 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
             }
 
             final boolean colouredText = ConfigOptions.COLOURED_HEADER_TEXT.getValue();
-            graphics.drawString(this.font, this.title, this.getContentX() + iconSize + gap, this.getContentY(), colouredText ? this.titleColour : -1);
+            graphics.text(this.font, this.title, this.getContentX() + iconSize + gap, this.getContentY(), colouredText ? this.titleColour : -1);
 
             Component versionComponent = hovered ? this.version : this.truncatedVersion;
             final int versionWidth = this.font.width(versionComponent);
-            graphics.drawString(this.font, versionComponent, this.getContentRight() - versionWidth, this.getContentY(), colouredText ? this.versionColour : CommonColors.LIGHT_GRAY);
+            graphics.text(this.font, versionComponent, this.getContentRight() - versionWidth, this.getContentY(), colouredText ? this.versionColour : CommonColors.LIGHT_GRAY);
         }
 
         @Override
@@ -427,10 +426,10 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
         }
 
         @Override
-        public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
-            super.renderContent(graphics, mouseX, mouseY, hovered, partialTick);
+        public void extractContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
+            super.extractContent(graphics, mouseX, mouseY, hovered, partialTick);
 
-            graphics.drawString(
+            graphics.text(
                 this.font,
                 this.title,
                 this.getContentX(),
@@ -447,10 +446,10 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
         }
 
         @Override
-        public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
-            super.renderContent(graphics, mouseX, mouseY, hovered, partialTick);
+        public void extractContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
+            super.extractContent(graphics, mouseX, mouseY, hovered, partialTick);
 
-            graphics.drawString(
+            graphics.text(
                 this.font,
                 "-",
                 this.getContentX() - this.font.width("- "),

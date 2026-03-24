@@ -4,7 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import games.enchanted.enchanteds_sodium_options.common.ModConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.TooltipRenderUtil;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
@@ -17,7 +17,7 @@ public class TooltipRenderHelper {
     static final Identifier TOOLTIP_BACKGROUND = Identifier.fromNamespaceAndPath(ModConstants.MOD_ID, "tooltip/background");
     static final int BODY_COLOUR = 0xffd8d8da;
 
-    public static void renderTooltip(TooltipRenderState state, Font font, GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+    public static void renderTooltip(TooltipRenderState state, Font font, GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
         List<FormattedCharSequence> bodyLines = state.content().getSplitBody(font, state.width() - (state.padding() * 2));
         Component impactText = state.content().getPerformanceImpact();
 
@@ -25,7 +25,7 @@ public class TooltipRenderHelper {
         final int effectiveHeight = state.height() + (state.padding() * 2);
 
         // background
-        TooltipRenderUtil.renderTooltipBackground(
+        TooltipRenderUtil.extractTooltipBackground(
             graphics,
             state.x() + TooltipRenderUtil.PADDING_LEFT,
             state.y() + TooltipRenderUtil.PADDING_TOP,
@@ -45,13 +45,13 @@ public class TooltipRenderHelper {
         }
 
         // value
-        graphics.drawString(font, state.content().getOptionValue(), state.x() + state.padding(), state.y() + state.padding(), -1);
+        graphics.text(font, state.content().getOptionValue(), state.x() + state.padding(), state.y() + state.padding(), -1);
 
         // body and performance impact
         for (int i = 0; i < bodyLines.size(); i++) {
             FormattedCharSequence line = bodyLines.get(i);
 
-            graphics.drawString(
+            graphics.text(
                 font,
                 line,
                 state.x() + state.padding(),
@@ -61,7 +61,7 @@ public class TooltipRenderHelper {
 
             // performance impact
             if(i == bodyLines.size() - 1 && impactText != null) {
-                graphics.drawString(
+                graphics.text(
                     font,
                     impactText,
                     state.x() + state.padding(),

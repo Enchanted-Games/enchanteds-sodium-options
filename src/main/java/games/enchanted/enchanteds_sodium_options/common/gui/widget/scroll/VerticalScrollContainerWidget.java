@@ -1,12 +1,12 @@
 package games.enchanted.enchanteds_sodium_options.common.gui.widget.scroll;
 
-import org.jspecify.annotations.NonNull;
+import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.Nullable;
 
 import games.enchanted.enchanteds_sodium_options.common.util.InputUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ComponentPath;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractContainerWidget;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.events.ContainerEventHandler;
@@ -31,14 +31,26 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public abstract class VerticalScrollContainerWidget<C extends VerticalScrollContainerWidget.Child> extends AbstractContainerWidget {
-    private static final int DEFAULT_SCROLLBAR_WIDTH = 10;
+    private static final Identifier SCROLLER_SPRITE = Identifier.withDefaultNamespace("widget/scroller");
+    private static final Identifier SCROLLER_BACKGROUND_SPRITE = Identifier.withDefaultNamespace("widget/scroller_background");
+    private static final int SCROLLBAR_MIN_HEIGHT = 32;
+    private static final int DEFAULT_SCROLLBAR_WIDTH = 6;
+    private static final int DEFAULT_SCROLL_RATE = 6;
 
     private final List<C> children = new ArrayList<>();
     @Nullable private C hoveredChild = null;
     @Nullable private C focusedChild = null;
 
     public VerticalScrollContainerWidget(int x, int y, int width, int height) {
-        super(x, y, width, height, CommonComponents.EMPTY);
+        super(x, y, width, height, CommonComponents.EMPTY, new ScrollbarSettings(
+            SCROLLER_SPRITE,
+            null,
+            SCROLLER_BACKGROUND_SPRITE,
+            DEFAULT_SCROLLBAR_WIDTH,
+            SCROLLBAR_MIN_HEIGHT,
+            DEFAULT_SCROLL_RATE,
+            false
+        ));
     }
 
     @Override
@@ -93,37 +105,33 @@ public abstract class VerticalScrollContainerWidget<C extends VerticalScrollCont
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    protected void extractWidgetRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int mouseX, int mouseY, float partialTick) {
         this.hoveredChild = this.isMouseOver(mouseX, mouseY) ? this.getChildAtPosition(mouseX, mouseY) : null;
-        this.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
-        this.enableScissor(guiGraphics);
-        this.renderChildren(guiGraphics, mouseX, mouseY, partialTick);
-        guiGraphics.disableScissor();
-        this.renderScrollbar(guiGraphics
-            //? if minecraft: >= 1.21.9 {
-            , mouseX, mouseY
-            //?}
-        );
+        this.renderBackground(GuiGraphicsExtractor, mouseX, mouseY, partialTick);
+        this.enableScissor(GuiGraphicsExtractor);
+        this.renderChildren(GuiGraphicsExtractor, mouseX, mouseY, partialTick);
+        GuiGraphicsExtractor.disableScissor();
+        this.extractScrollbar(GuiGraphicsExtractor, mouseX, mouseY);
         if(InputUtil.shouldShowDebugWidgetBound()) {
-            guiGraphics.renderOutline(this.getX(), this.getY(), this.width, this.height, 0xff9f7252);
+            GuiGraphicsExtractor.outline(this.getX(), this.getY(), this.width, this.height, 0xff9f7252);
         }
     }
 
-    protected void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int mouseX, int mouseY, float partialTick) {
     }
 
-    protected void enableScissor(final GuiGraphics graphics) {
+    protected void enableScissor(final GuiGraphicsExtractor graphics) {
         graphics.enableScissor(this.getX(), this.getY(), this.getRight(), this.getBottom());
     }
 
-    protected void renderChildren(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partialTicks) {
+    protected void renderChildren(final GuiGraphicsExtractor GuiGraphicsExtractor, final int mouseX, final int mouseY, final float partialTicks) {
         for (C child : this.children) {
             if (child.getY() + child.getHeight() >= this.getY() && child.getY() <= this.getBottom()) {
                 if(InputUtil.shouldShowDebugWidgetBound()) {
-                    guiGraphics.renderOutline(child.getX(), child.getY(), child.getWidth(), child.getHeight(), 0xffc57cb9);
-                    guiGraphics.renderOutline(child.getContentX(), child.getContentY(), child.getContentWidth(), child.getContentHeight(), 0xff56a8f5);
+                    GuiGraphicsExtractor.outline(child.getX(), child.getY(), child.getWidth(), child.getHeight(), 0xffc57cb9);
+                    GuiGraphicsExtractor.outline(child.getContentX(), child.getContentY(), child.getContentWidth(), child.getContentHeight(), 0xff56a8f5);
                 }
-                child.renderContent(guiGraphics, mouseX, mouseY, this.hoveredChild == child, partialTicks);
+                child.extractContent(GuiGraphicsExtractor, mouseX, mouseY, this.hoveredChild == child, partialTicks);
             }
         }
     }
@@ -142,10 +150,6 @@ public abstract class VerticalScrollContainerWidget<C extends VerticalScrollCont
     @Override
     protected int scrollBarX() {
         return this.getRowRight() + Math.abs(this.getRowWidth() - this.getWidth()) / 2 - 1;
-    }
-
-    protected int scrollbarWidth() {
-        return DEFAULT_SCROLLBAR_WIDTH;
     }
 
     private void scrollBy(int amount) {
@@ -281,7 +285,7 @@ public abstract class VerticalScrollContainerWidget<C extends VerticalScrollCont
     }
 
     public int getRowLeft() {
-        return this.getX() + (scrollbarVisible() ? 0 : SCROLLBAR_WIDTH);
+        return this.getX() + (this.scrollable() ? 0 : SCROLLBAR_WIDTH);
     }
 
     public int getRowRight() {
@@ -480,7 +484,7 @@ public abstract class VerticalScrollContainerWidget<C extends VerticalScrollCont
         @Nullable
         @Override
         public ComponentPath nextFocusPath(FocusNavigationEvent navigationEvent) {
-            if (!(navigationEvent instanceof FocusNavigationEvent.ArrowNavigation(ScreenDirection direction))) {
+            if (!(navigationEvent instanceof FocusNavigationEvent.ArrowNavigation(ScreenDirection direction, @Nullable ScreenRectangle previousFocus))) {
                 return ContainerEventHandler.super.nextFocusPath(navigationEvent);
             }
             if (direction == ScreenDirection.UP || direction == ScreenDirection.DOWN) return null;
@@ -497,7 +501,7 @@ public abstract class VerticalScrollContainerWidget<C extends VerticalScrollCont
             return ContainerEventHandler.super.nextFocusPath(navigationEvent);
         }
 
-        public abstract void renderContent(final GuiGraphics graphics, int mouseX, int mouseY, boolean hovered, float partialTick);
+        public abstract void extractContent(final GuiGraphicsExtractor graphics, int mouseX, int mouseY, boolean hovered, float partialTick);
 
         public abstract List<? extends AbstractWidget> widgetChildren();
 

@@ -27,10 +27,9 @@ stonecutter {
 
         // use fabric_remap as the loader for obfuscated minecraft versions (26.1 or above)
 
-        ver("1.21.11", "fabric_remap", "neoforge")
-//        ver("26.1", "fabric")
+        ver("26.1", "fabric", "neoforge")
 
-        vcsVersion = "1.21.11-fabric"
+        vcsVersion = "26.1-fabric"
     }
 }
 

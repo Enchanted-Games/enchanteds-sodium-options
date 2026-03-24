@@ -18,7 +18,7 @@ import net.caffeinemc.mods.sodium.client.config.structure.*;
 import net.caffeinemc.mods.sodium.client.gui.VideoSettingsScreen;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
@@ -372,14 +372,14 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
+    public void extractRenderState(GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(guiGraphicsExtractor, mouseX, mouseY, partialTick);
 
         if(this.tooltipState != null) {
             TooltipRenderHelper.renderTooltip(
                 this.extractTooltipRenderState(this.tooltipState),
                 this.font,
-                guiGraphics,
+                guiGraphicsExtractor,
                 mouseX,
                 mouseY,
                 partialTick

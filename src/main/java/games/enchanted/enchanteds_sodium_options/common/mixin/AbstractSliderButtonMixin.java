@@ -5,7 +5,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import games.enchanted.enchanteds_sodium_options.common.gui.widget.extension.AbstractSliderButtonExtension;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.network.chat.Component;
@@ -21,12 +21,12 @@ public abstract class AbstractSliderButtonMixin extends AbstractWidget {
 
     @WrapOperation(
         at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/AbstractSliderButton;isHovered()Z"),
-        method = "renderWidget"
+        method = "handleCursor"
     )
-    public boolean wrapHoverCheck(AbstractSliderButton instance, Operation<Boolean> original, GuiGraphics guiGraphics) {
+    public boolean wrapHoverCheck(AbstractSliderButton instance, Operation<Boolean> original, GuiGraphicsExtractor GuiGraphicsExtractor) {
         if(this instanceof AbstractSliderButtonExtension) {
             if(original.call(instance) && !this.isActive()) {
-                guiGraphics.requestCursor(CursorTypes.NOT_ALLOWED);
+                GuiGraphicsExtractor.requestCursor(CursorTypes.NOT_ALLOWED);
                 return false;
             }
         }

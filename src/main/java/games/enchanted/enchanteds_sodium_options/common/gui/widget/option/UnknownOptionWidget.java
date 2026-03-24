@@ -4,7 +4,7 @@ import games.enchanted.enchanteds_sodium_options.common.ModConstants;
 import games.enchanted.enchanteds_sodium_options.common.mixin.accessor.sodium.OptionAccessor;
 import net.caffeinemc.mods.sodium.client.config.structure.Option;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
@@ -51,8 +51,8 @@ public class UnknownOptionWidget extends AbstractButton {
     }
 
     @Override
-    protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
-        guiGraphics.blitSprite(
+    protected void extractContents(GuiGraphicsExtractor guiGraphicsExtractor, int i, int j, float f) {
+        guiGraphicsExtractor.blitSprite(
             RenderPipelines.GUI_TEXTURED,
             SPRITES.get(this.option.isEnabled(), this.isHoveredOrFocused()),
             this.getX(),
@@ -66,7 +66,7 @@ public class UnknownOptionWidget extends AbstractButton {
         int right = this.getX() + this.getWidth() - 4;
         int top = this.getY();
         int bottom = this.getY() + this.getHeight();
-        guiGraphics.textRendererForWidget(this, GuiGraphics.HoveredTextEffects.NONE)
+        guiGraphicsExtractor.textRendererForWidget(this, GuiGraphicsExtractor.HoveredTextEffects.NONE)
             .acceptScrollingWithDefaultCenter(this.message, left, right, top, bottom);
     }
 

@@ -5,7 +5,7 @@ import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.TooltipConte
 import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.TooltipConsumer;
 import games.enchanted.enchanteds_sodium_options.common.util.ComponentUtil;
 import net.caffeinemc.mods.sodium.client.config.structure.EnumOption;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.input.InputWithModifiers;
 import org.jspecify.annotations.Nullable;
@@ -47,9 +47,9 @@ public class EnumCyclerWidget<T extends Enum<T>> extends Button implements Optio
     }
 
     @Override
-    protected void renderContents(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-        this.renderDefaultSprite(guiGraphics);
-        this.renderDefaultLabel(guiGraphics.textRendererForWidget(this, GuiGraphics.HoveredTextEffects.NONE));
+    protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
+        this.extractDefaultSprite(graphics);
+        this.extractDefaultLabel(graphics.textRendererForWidget(this, GuiGraphicsExtractor.HoveredTextEffects.NONE));
         if(this.isHoveredOrFocused()) {
             this.tooltipConsumer.submitTooltipContent(this.tooltipContent, this.isHovered(), this.isFocused(), this.getRectangle());
         }

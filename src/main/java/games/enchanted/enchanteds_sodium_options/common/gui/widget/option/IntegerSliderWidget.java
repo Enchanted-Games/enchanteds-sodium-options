@@ -8,7 +8,7 @@ import games.enchanted.enchanteds_sodium_options.common.gui.widget.extension.Abs
 import games.enchanted.enchanteds_sodium_options.common.util.ComponentUtil;
 import net.caffeinemc.mods.sodium.api.config.option.SteppedValidator;
 import net.caffeinemc.mods.sodium.client.config.structure.IntegerOption;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.input.KeyEvent;
@@ -58,8 +58,8 @@ public class IntegerSliderWidget extends AbstractSliderButton implements Abstrac
     }
 
     @Override
-    public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-        super.renderWidget(guiGraphics, mouseX, mouseY, partialTicks);
+    public void extractWidgetRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int mouseX, int mouseY, float partialTicks) {
+        super.extractWidgetRenderState(GuiGraphicsExtractor, mouseX, mouseY, partialTicks);
         if(this.isHoveredOrFocused()) {
             this.tooltipConsumer.submitTooltipContent(this.tooltipContent, this.isHovered(), this.isFocused(), this.getRectangle());
         }

@@ -5,7 +5,7 @@ import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.TooltipConte
 import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.TooltipConsumer;
 import games.enchanted.enchanteds_sodium_options.common.util.ComponentUtil;
 import net.caffeinemc.mods.sodium.client.config.structure.BooleanOption;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -51,13 +51,13 @@ public class OnOffWidget extends Button implements OptionWidget<BooleanOption>, 
     }
 
     @Override
-    protected void renderContents(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    protected void extractContents(GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, float partialTicks) {
         if(this.isActive()) {
-            this.renderDefaultSprite(guiGraphics);
+            this.extractDefaultSprite(guiGraphicsExtractor);
         } else {
-            guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, DISABLED_SPRITE, this.getX(), this.getY(), this.getWidth(), this.getHeight(), ARGB.white(this.alpha));
+            guiGraphicsExtractor.blitSprite(RenderPipelines.GUI_TEXTURED, DISABLED_SPRITE, this.getX(), this.getY(), this.getWidth(), this.getHeight(), ARGB.white(this.alpha));
         }
-        this.renderDefaultLabel(guiGraphics.textRendererForWidget(this, GuiGraphics.HoveredTextEffects.NONE));
+        this.extractDefaultLabel(guiGraphicsExtractor.textRendererForWidget(this, GuiGraphicsExtractor.HoveredTextEffects.NONE));
         if(this.isHoveredOrFocused()) {
             this.tooltipConsumer.submitTooltipContent(this.tooltipContent, this.isHovered(), this.isFocused(), this.getRectangle());
         }
