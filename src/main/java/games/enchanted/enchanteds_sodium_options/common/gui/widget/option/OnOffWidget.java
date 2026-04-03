@@ -17,13 +17,13 @@ import org.jspecify.annotations.Nullable;
 public class OnOffWidget extends Button implements OptionWidget<BooleanOption>, AbstractWidgetPreventTooltipRender {
     private static final Identifier DISABLED_SPRITE = Identifier.withDefaultNamespace("widget/button_disabled");
 
-    final TooltipContent tooltipContent;
-    final TooltipConsumer tooltipConsumer;
+    protected final TooltipContent tooltipContent;
+    protected final TooltipConsumer tooltipConsumer;
 
-    final BooleanOption option;
-    boolean value;
+    protected final BooleanOption option;
+    protected boolean value;
 
-    @Nullable OnChange onChange = null;
+    protected @Nullable OnChange onChange = null;
 
     public OnOffWidget(int x, int y, BooleanOption option, TooltipConsumer tooltipConsumer) {
         super(x, y, Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, option.getName(), (button) -> {}, DEFAULT_NARRATION);

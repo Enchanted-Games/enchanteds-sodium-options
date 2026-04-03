@@ -11,14 +11,14 @@ import net.minecraft.client.input.InputWithModifiers;
 import org.jspecify.annotations.Nullable;
 
 public class EnumCyclerWidget<T extends Enum<T>> extends Button implements OptionWidget<EnumOption<T>>, AbstractWidgetPreventTooltipRender {
-    final TooltipContent tooltipContent;
-    final TooltipConsumer tooltipConsumer;
+    protected final TooltipContent tooltipContent;
+    protected final TooltipConsumer tooltipConsumer;
 
-    final EnumOption<T> option;
-    T value;
-    final T[] enumValues;
+    protected final EnumOption<T> option;
+    protected T value;
+    protected final T[] enumValues;
 
-    @Nullable OnChange onChange = null;
+    protected @Nullable OnChange onChange = null;
 
     public EnumCyclerWidget(int x, int y, EnumOption<T> option, TooltipConsumer tooltipConsumer) {
         super(x, y, Button.DEFAULT_WIDTH, Button.DEFAULT_HEIGHT, option.getName(), (button) -> {}, DEFAULT_NARRATION);

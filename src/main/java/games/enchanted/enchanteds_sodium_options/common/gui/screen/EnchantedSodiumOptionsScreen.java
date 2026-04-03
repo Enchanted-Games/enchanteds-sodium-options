@@ -63,7 +63,6 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
 
     final ArrayList<OptionWidget<?>> optionWidgets = new ArrayList<>();
 
-    ScreenRectangle topHalfRectangle = new ScreenRectangle(0, 0, 0, 0);
     @Nullable protected TooltipState tooltipState = null;
 
     protected EnchantedSodiumOptionsScreen(Screen parent, Component title) {
@@ -100,7 +99,7 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
             int headerHeight = this.layout.getHeaderHeight();
 
             this.donateButton = Button.builder(DONATION_BUTTON_TEXT, button -> {
-                Util.getPlatform().openUri("https://caffeinemc.net/donate");
+                Util.getPlatform().openUri(ModConstants.SODIUM_DONATION);
             }).width(FOOTER_BUTTON_WIDTH).build();
             this.addRenderableWidget(this.donateButton);
 
@@ -422,7 +421,6 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
     protected void repositionElements() {
         this.layout.arrangeElements();
         int headerHeight = this.layout.getHeaderHeight();
-        this.topHalfRectangle = new ScreenRectangle(0, 0, this.width, (this.height / 2));
 
         if(this.shaderpacksButton != null) {
             this.shaderpacksButton.setPosition(

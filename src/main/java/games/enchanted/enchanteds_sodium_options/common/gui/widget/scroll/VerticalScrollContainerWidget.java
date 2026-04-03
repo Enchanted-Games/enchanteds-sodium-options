@@ -1,5 +1,7 @@
 package games.enchanted.enchanteds_sodium_options.common.gui.widget.scroll;
 
+import games.enchanted.enchanteds_sodium_options.common.Logging;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.Nullable;
 
@@ -467,7 +469,9 @@ public abstract class VerticalScrollContainerWidget<C extends VerticalScrollCont
             if (newFocus != null) {
                 newFocus.setFocused(true);
             }
-            this.focusedElement = newFocus;
+            if (!this.isDragging()) {
+                this.focusedElement = newFocus;
+            }
         }
 
         @Override
@@ -490,7 +494,14 @@ public abstract class VerticalScrollContainerWidget<C extends VerticalScrollCont
             if (direction == ScreenDirection.UP || direction == ScreenDirection.DOWN) return null;
 
             int indexDirection = direction == ScreenDirection.LEFT ? -1 : 1;
-            int index = Mth.clamp(indexDirection + this.children().indexOf(this.getFocused()), 0, this.children().size() - 1);
+            int indexOfFocus;
+            try {
+                 indexOfFocus = this.children().indexOf(this.getFocused());
+            } catch (Exception e) {
+                return ContainerEventHandler.super.nextFocusPath(navigationEvent);
+            }
+
+            int index = Mth.clamp(indexDirection + indexOfFocus, 0, this.children().size() - 1);
 
             for (int i = index; i >= 0 && i < this.children().size(); i += indexDirection) {
                 ComponentPath componentPath = this.children().get(i).nextFocusPath(navigationEvent);
