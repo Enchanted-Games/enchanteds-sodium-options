@@ -2,9 +2,11 @@ package games.enchanted.enchanteds_sodium_options.common.config.option;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import games.enchanted.enchanteds_sodium_options.common.ModConstants;
 import net.caffeinemc.mods.sodium.api.config.structure.ConfigBuilder;
 import net.caffeinemc.mods.sodium.api.config.structure.OptionGroupBuilder;
 import net.caffeinemc.mods.sodium.api.config.structure.StatefulOptionBuilder;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -84,6 +86,10 @@ public abstract class ConfigOption<T> {
 
     public boolean isDirty() {
         return this.pendingValue != null;
+    }
+
+    public Identifier getConfigId() {
+        return Identifier.fromNamespaceAndPath(ModConstants.MOD_ID, this.getJsonKey());
     }
 
     public abstract StatefulOptionBuilder<T> createSodiumOption(ConfigBuilder builder, OptionGroupBuilder group);

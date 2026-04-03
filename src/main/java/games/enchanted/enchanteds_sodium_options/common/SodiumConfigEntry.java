@@ -22,7 +22,7 @@ public class SodiumConfigEntry implements ConfigEntryPoint {
             .setColorTheme(builder.createColorTheme().setBaseThemeRGB(ACCENT_COLOUR))
             .addPage(builder.createOptionPage()
                 .setName(Component.translatable("gui.enchanted_sodium_options.group.visual"))
-                .addOptionGroup(createGroup(builder, List.of(
+                .addOptionGroup(createSimpleGroup(builder, List.of(
                     ConfigOptions.ACCENT_BARS,
                     ConfigOptions.SHOW_MOD_ICONS,
                     ConfigOptions.COLOURED_HEADER_TEXT,
@@ -31,19 +31,34 @@ public class SodiumConfigEntry implements ConfigEntryPoint {
             )
             .addPage(builder.createOptionPage()
                 .setName(Component.translatable("gui.enchanted_sodium_options.group.behaviour"))
-                .addOptionGroup(createGroup(builder, List.of(
-                    ConfigOptions.COLLAPSE_THRESHOLD,
-                    ConfigOptions.COLLAPSE_SODIUM_OPTIONS
-                )))
+                .addOptionGroup(createBehaviourGroup(builder))
             )
         ;
     }
 
-    private static OptionGroupBuilder createGroup(ConfigBuilder builder, List<ConfigOption<?>> options) {
+    private static OptionGroupBuilder createSimpleGroup(ConfigBuilder builder, List<ConfigOption<?>> options) {
         var group = builder.createOptionGroup();
         for (ConfigOption<?> option : options) {
             group.addOption(option.createSodiumOption(builder, group));
         }
+        return group;
+    }
+
+    private static OptionGroupBuilder createBehaviourGroup(ConfigBuilder builder) {
+        var group = builder.createOptionGroup();
+        group.addOption(ConfigOptions.USE_TABS.createSodiumOption(builder, group));
+        group.addOption(
+            ConfigOptions.COLLAPSE_THRESHOLD.createSodiumOption(builder, group).setEnabledProvider(
+                configState -> !configState.readBooleanOption(ConfigOptions.USE_TABS.getConfigId()),
+                ConfigOptions.USE_TABS.getConfigId()
+            )
+        );
+        group.addOption(
+            ConfigOptions.COLLAPSE_SODIUM_OPTIONS.createSodiumOption(builder, group).setEnabledProvider(
+                configState -> !configState.readBooleanOption(ConfigOptions.USE_TABS.getConfigId()),
+                ConfigOptions.USE_TABS.getConfigId()
+            )
+        );
         return group;
     }
 }

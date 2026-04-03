@@ -15,7 +15,7 @@ public class SubOptionsScreen extends EnchantedSodiumOptionsScreen {
     final VideoOptionsList.ModInfo modInfo;
 
     public SubOptionsScreen(OptionPage page, EnchantedSodiumOptionsScreen parent, VideoOptionsList.ModInfo modInfo) {
-        super(parent, page.name());
+        super(parent, page.name(), 0.0d);
         this.videoParent = parent;
         this.page = page;
         this.modInfo = modInfo;

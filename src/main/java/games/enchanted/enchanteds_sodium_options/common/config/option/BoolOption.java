@@ -31,7 +31,7 @@ public class BoolOption extends ConfigOption<Boolean> {
     @Override
     public StatefulOptionBuilder<Boolean> createSodiumOption(ConfigBuilder builder, OptionGroupBuilder group) {
         String optionId = this.getJsonKey();
-        return builder.createBooleanOption(Identifier.fromNamespaceAndPath(ModConstants.MOD_ID, optionId))
+        return builder.createBooleanOption(this.getConfigId())
             .setName(ComponentUtil.componentForOption(optionId))
             .setTooltip(ComponentUtil.componentForOption(optionId, true))
             .setStorageHandler(ConfigOptions::saveConfig)

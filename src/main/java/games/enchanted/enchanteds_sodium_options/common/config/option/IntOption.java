@@ -39,7 +39,7 @@ public class IntOption extends ConfigOption<Integer> {
     @Override
     public StatefulOptionBuilder<Integer> createSodiumOption(ConfigBuilder builder, OptionGroupBuilder group) {
         String optionId = this.getJsonKey();
-        return builder.createIntegerOption(Identifier.fromNamespaceAndPath(ModConstants.MOD_ID, optionId))
+        return builder.createIntegerOption(this.getConfigId())
             .setName(ComponentUtil.componentForOption(optionId))
             .setTooltip(ComponentUtil.componentForOption(optionId, true))
             .setStorageHandler(ConfigOptions::saveConfig)

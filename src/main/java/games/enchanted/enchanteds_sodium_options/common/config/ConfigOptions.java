@@ -44,6 +44,12 @@ public class ConfigOptions {
     ));
 
     // behaviour
+    public static final ConfigOption<Boolean> USE_TABS = registerOption(new BoolOption(
+        false,
+        false,
+        "use_tabs"
+    ));
+
     public static final ConfigOption<Integer> COLLAPSE_THRESHOLD = registerOption(new CollapseThresholdOption(
         6,
         6,

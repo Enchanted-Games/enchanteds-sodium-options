@@ -6,6 +6,8 @@ import games.enchanted.enchanteds_sodium_options.common.Logging;
 import games.enchanted.enchanteds_sodium_options.common.ModConstants;
 import games.enchanted.enchanteds_sodium_options.common.compat.iris.IrisShaderButtonBuilder;
 import games.enchanted.enchanteds_sodium_options.common.config.ConfigOptions;
+import games.enchanted.enchanteds_sodium_options.common.config.option.ConfigOption;
+import games.enchanted.enchanteds_sodium_options.common.gui.RefreshState;
 import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.TooltipConsumer;
 import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.TooltipContent;
 import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.TooltipRenderHelper;
@@ -36,6 +38,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -49,10 +52,17 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
     private static final int TOOLTIP_SPACE_MARGIN_INLINE = 10;
     private static final int TOOLTIP_SPACE_MARGIN_BLOCK = HeaderAndFooterLayout.DEFAULT_HEADER_AND_FOOTER_HEIGHT;
 
+    private static final List<ConfigOption<?>> REFRESH_SCREEN_OPTIONS = List.of(
+        ConfigOptions.USE_TABS,
+        ConfigOptions.COLLAPSE_SODIUM_OPTIONS,
+        ConfigOptions.COLLAPSE_THRESHOLD
+    );
+
     public static boolean forceSodiumScreen = false;
 
+    protected final Screen parent;
+    protected double initialScrollAmount;
     public final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
-    final Screen parent;
     @Nullable VideoOptionsList optionsList;
     @Nullable AbstractWidget undoButton;
     @Nullable AbstractWidget applyButton;
@@ -61,16 +71,19 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
     @Nullable AbstractWidget donateButton;
     @Nullable AbstractWidget shaderpacksButton;
 
-    final ArrayList<OptionWidget<?>> optionWidgets = new ArrayList<>();
+    protected final ArrayList<OptionWidget<?>> optionWidgets = new ArrayList<>();
 
     @Nullable protected TooltipState tooltipState = null;
+    protected final RefreshState refreshState;
 
-    protected EnchantedSodiumOptionsScreen(Screen parent, Component title) {
+    protected EnchantedSodiumOptionsScreen(Screen parent, Component title, double initialScrollAmount) {
         super(title);
         this.parent = parent;
+        this.initialScrollAmount = initialScrollAmount;
+        this.refreshState = new RefreshState(RefreshState.createInitialValuesMap(REFRESH_SCREEN_OPTIONS));
     }
-    protected EnchantedSodiumOptionsScreen(Screen parent) {
-        this(parent, TITLE);
+    protected EnchantedSodiumOptionsScreen(Screen parent, double initialScrollAmount) {
+        this(parent, TITLE, initialScrollAmount);
     }
 
     public static Screen createSodiumScreen(Screen parent) {
@@ -81,8 +94,12 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
     }
 
     public static Screen create(Screen parent) {
+        return create(parent, 0.0d);
+    }
+
+    public static Screen create(Screen parent, double initialScrollAmount) {
         try {
-            Screen screen = new EnchantedSodiumOptionsScreen(parent);
+            Screen screen = new EnchantedSodiumOptionsScreen(parent, initialScrollAmount);
             ConfigManager.CONFIG.resetAllOptionsFromBindings();
             return screen;
         } catch (Exception e) {
@@ -313,6 +330,12 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
 
     private void saveChanges() {
         ConfigManager.CONFIG.applyAllOptions();
+        if(this.refreshState.anyChanged(REFRESH_SCREEN_OPTIONS)) {
+            Minecraft.getInstance().setScreen(create(
+                this.parent,
+                Objects.requireNonNull(this.optionsList, "Options list was null").scrollAmount()
+            ));
+        }
         this.refreshOptionWidgetValues();
     }
 
@@ -444,6 +467,11 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
                 headerHeight
             );
             this.optionsList.repositionElements();
+
+            if(this.initialScrollAmount > 0) {
+                this.optionsList.setScrollAmount(this.initialScrollAmount);
+                this.initialScrollAmount = 0.0d;
+            }
         }
 
         this.refreshOptionWidgetVisuals();
