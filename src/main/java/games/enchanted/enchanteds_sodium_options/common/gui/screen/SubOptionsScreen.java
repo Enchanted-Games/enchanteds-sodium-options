@@ -7,6 +7,7 @@ import net.caffeinemc.mods.sodium.client.config.structure.OptionGroup;
 import net.caffeinemc.mods.sodium.client.config.structure.OptionPage;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 
 public class SubOptionsScreen extends EnchantedSodiumOptionsScreen {
@@ -33,7 +34,7 @@ public class SubOptionsScreen extends EnchantedSodiumOptionsScreen {
         }
 
         ImmutableList<OptionGroup> groups = page.groups();
-        this.buildGroupOptions(groups, this.modInfo);
+        this.buildGroupOptions(groups, this.modInfo, this.optionsList);
     }
 
     @Override
@@ -60,6 +61,11 @@ public class SubOptionsScreen extends EnchantedSodiumOptionsScreen {
     public void onClose() {
         super.onClose();
         this.videoParent.refreshOptionWidgetVisuals();
+    }
+
+    @Override
+    protected Screen getNonVideoOptionsParent() {
+        return this.videoParent.parent;
     }
 
     @Override

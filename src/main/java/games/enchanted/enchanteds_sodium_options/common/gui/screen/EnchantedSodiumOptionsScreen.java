@@ -13,6 +13,7 @@ import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.TooltipConte
 import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.TooltipRenderHelper;
 import games.enchanted.enchanteds_sodium_options.common.gui.widget.option.*;
 import games.enchanted.enchanteds_sodium_options.common.gui.widget.scroll.VideoOptionsList;
+import games.enchanted.enchanteds_sodium_options.common.gui.widget.tab.OptionListTabBar;
 import games.enchanted.enchanteds_sodium_options.common.mixin.accessor.sodium.OptionAccessor;
 import games.enchanted.enchanteds_sodium_options.common.util.ComponentUtil;
 import net.caffeinemc.mods.sodium.client.config.ConfigManager;
@@ -23,6 +24,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.tabs.TabManager;
+import net.minecraft.client.gui.components.tabs.TabNavigationBar;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
@@ -37,8 +40,9 @@ import net.minecraft.util.Util;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -62,14 +66,19 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
 
     protected final Screen parent;
     protected double initialScrollAmount;
-    public final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
-    @Nullable VideoOptionsList optionsList;
-    @Nullable AbstractWidget undoButton;
-    @Nullable AbstractWidget applyButton;
-    @Nullable AbstractWidget doneButton;
 
-    @Nullable AbstractWidget donateButton;
-    @Nullable AbstractWidget shaderpacksButton;
+    public final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
+    protected @Nullable VideoOptionsList optionsList;
+    protected Map<String, OptionListTab> tabsByConfigId = new HashMap<>();
+    protected final TabManager tabManager = new TabManager(this::addRenderableWidget, this::removeWidget);
+    protected @Nullable TabNavigationBar tabNavigationBar;
+
+    protected @Nullable AbstractWidget undoButton;
+    protected @Nullable AbstractWidget applyButton;
+    protected @Nullable AbstractWidget doneButton;
+
+    protected @Nullable AbstractWidget donateButton;
+    protected @Nullable AbstractWidget shaderpacksButton;
 
     protected final ArrayList<OptionWidget<?>> optionWidgets = new ArrayList<>();
 
@@ -111,40 +120,11 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
     protected void init() {
         try {
             ConfigManager.CONFIG.invalidateGlobalRebuildDependents();
-
-            this.layout.addTitleHeader(this.title, this.font);
-            int headerHeight = this.layout.getHeaderHeight();
-
-            this.donateButton = Button.builder(DONATION_BUTTON_TEXT, button -> {
-                Util.getPlatform().openUri(ModConstants.SODIUM_DONATION);
-            }).width(FOOTER_BUTTON_WIDTH).build();
-            this.addRenderableWidget(this.donateButton);
-
-            this.shaderpacksButton = IrisShaderButtonBuilder.getInstance().createShaderpacksButton(this, FOOTER_BUTTON_WIDTH);
-            if(this.shaderpacksButton != null) {
-                this.addRenderableWidget(this.shaderpacksButton);
+            if(ConfigOptions.USE_TABS.getValue()) {
+                this.createTabsLayout();
+            } else {
+                this.createSingleColumnLayout();
             }
-
-            LinearLayout footerLayout = this.layout.addToFooter(LinearLayout.horizontal().spacing(8));
-            this.undoButton = footerLayout.addChild(
-                Button.builder(ComponentUtil.UNDO, button -> this.undoChanges()).width(FOOTER_BUTTON_WIDTH).build()
-            );
-            this.applyButton = footerLayout.addChild(
-                Button.builder(ComponentUtil.APPLY, button -> this.saveChanges()).width(FOOTER_BUTTON_WIDTH).build()
-            );
-            this.doneButton = footerLayout.addChild(
-                this.buildDoneButtonWidget()
-            );
-
-            this.optionsList = new VideoOptionsList(
-                0,
-                headerHeight,
-                this.width,
-                this.height - headerHeight - this.layout.getFooterHeight()
-            );
-            this.addRenderableWidget(this.optionsList);
-
-            this.buildSodiumOptionWidgets();
 
             this.visitOptionsAndAddListeners();
             this.layout.visitWidgets(this::addRenderableWidget);
@@ -157,15 +137,65 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
         }
     }
 
+    protected void createTabsLayout() {
+        this.buildSodiumOptionWidgets();
+
+        this.tabNavigationBar = new OptionListTabBar(this.width, this.tabManager, new ArrayList<>(this.tabsByConfigId.values()));
+        this.addRenderableWidget(this.tabNavigationBar);
+        this.tabNavigationBar.selectTab(0, false);
+
+        this.createDonateAndShaderWidgets();
+        this.createFooterWidgets();
+    }
+
+    protected void createSingleColumnLayout() {
+        this.layout.addTitleHeader(this.title, this.font);
+        int headerHeight = this.layout.getHeaderHeight();
+
+        this.createDonateAndShaderWidgets();
+        this.createFooterWidgets();
+
+        this.optionsList = new VideoOptionsList(
+            0,
+            headerHeight,
+            this.width,
+            this.height - headerHeight - this.layout.getFooterHeight()
+        );
+        this.addRenderableWidget(this.optionsList);
+
+        this.buildSodiumOptionWidgets();
+    }
+
+    protected void createDonateAndShaderWidgets() {
+        this.donateButton = Button.builder(DONATION_BUTTON_TEXT, button -> {
+            Util.getPlatform().openUri(ModConstants.SODIUM_DONATION);
+        }).width(FOOTER_BUTTON_WIDTH).build();
+        this.addRenderableWidget(this.donateButton);
+
+        this.shaderpacksButton = IrisShaderButtonBuilder.getInstance().createShaderpacksButton(this, FOOTER_BUTTON_WIDTH);
+        if(this.shaderpacksButton != null) {
+            this.addRenderableWidget(this.shaderpacksButton);
+        }
+    }
+
+    protected void createFooterWidgets() {
+        LinearLayout footerLayout = this.layout.addToFooter(LinearLayout.horizontal().spacing(8));
+        this.undoButton = footerLayout.addChild(
+            Button.builder(ComponentUtil.UNDO, button -> this.undoChanges()).width(FOOTER_BUTTON_WIDTH).build()
+        );
+        this.applyButton = footerLayout.addChild(
+            Button.builder(ComponentUtil.APPLY, button -> this.saveChanges()).width(FOOTER_BUTTON_WIDTH).build()
+        );
+        this.doneButton = footerLayout.addChild(
+            this.buildDoneButtonWidget()
+        );
+    }
+
     protected AbstractWidget buildDoneButtonWidget() {
         return Button.builder(CommonComponents.GUI_DONE, button -> this.onClose()).width(FOOTER_BUTTON_WIDTH).build();
     }
 
     protected void buildSodiumOptionWidgets() {
-        if(this.optionsList == null) {
-            throw new IllegalStateException("optionList is null trying to build sodium option widgets");
-        }
-
         List<ModOptions> modOptions = ConfigManager.CONFIG.getModOptions();
 
         for (ModOptions options : modOptions) {
@@ -179,23 +209,42 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
                 VideoOptionsList.IconInfo.create(options.icon(), options.iconMonochrome())
             );
 
-            this.optionsList.addModTitle(
-                Component.literal(options.name()),
-                options.version(),
-                options.icon(),
-                options.iconMonochrome(),
-                modInfo
-            );
+            Component modTitle = Component.literal(options.name());
 
-            this.buildPages(options.pages(), modInfo);
+            if(ConfigOptions.USE_TABS.getValue()) {
+                String configId = options.configId();
+                if(this.tabsByConfigId.containsKey(options.configId())) {
+                    throw new IllegalStateException("Tried to create two tabs for the same config id '" + configId + "'!");
+                }
+
+                OptionListTab tab = new OptionListTab(modTitle);
+                this.tabsByConfigId.put(configId, tab);
+
+                VideoOptionsList optionsList = tab.getOptionsList();
+
+                optionsList.addSpacer(3, modInfo);
+
+                this.buildPages(options.pages(), modInfo, optionsList);
+            }
+            else {
+                if(this.optionsList == null) {
+                    throw new IllegalStateException("optionList is null trying to build sodium option widgets for single column layout");
+                }
+
+                this.optionsList.addModTitle(
+                    modTitle,
+                    options.version(),
+                    options.icon(),
+                    options.iconMonochrome(),
+                    modInfo
+                );
+
+                this.buildPages(options.pages(), modInfo, this.optionsList);
+            }
         }
     }
 
-    protected void buildPages(ImmutableList<Page> pages, VideoOptionsList.ModInfo modInfo) {
-        if(this.optionsList == null) {
-            throw new IllegalStateException("optionList is null trying to build pages");
-        }
-
+    protected void buildPages(ImmutableList<Page> pages, VideoOptionsList.ModInfo modInfo, VideoOptionsList optionsList) {
         boolean allPagesCollapsed = true;
         List<OptionPage> collapsedOptionPages = new ArrayList<>();
 
@@ -203,7 +252,7 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
             if(page instanceof ExternalPage(
                 Component name, Consumer<Screen> currentScreenConsumer
             )) {
-                this.optionsList.addBigOption(
+                optionsList.addBigOption(
                     Button.builder(ComponentUtil.appendEllipsis(name), button -> currentScreenConsumer.accept(this)).build(),
                     modInfo
                 );
@@ -221,7 +270,7 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
                 }
 
                 allPagesCollapsed = false;
-                this.buildPageOptions(optionPage, new CollapsedPageInfo(false, false), modInfo);
+                this.buildPageOptions(optionPage, new CollapsedPageInfo(false, false), modInfo, optionsList);
             }
             else {
                 Logging.warn("Unknown page type. Class: {}, Name: {}", page.getClass().getCanonicalName(), page.name().getString());
@@ -230,23 +279,19 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
 
         if(!collapsedOptionPages.isEmpty()) {
             if(!allPagesCollapsed) {
-                this.optionsList.addCategoryHeader(Component.translatable("gui.enchanted_sodium_options.group.more"), modInfo);
+                optionsList.addCategoryHeader(Component.translatable("gui.enchanted_sodium_options.group.more"), modInfo);
             }
 
             for (OptionPage page : collapsedOptionPages) {
-                this.buildPageOptions(page, new CollapsedPageInfo(true, collapsedOptionPages.size() == 1), modInfo);
+                this.buildPageOptions(page, new CollapsedPageInfo(true, collapsedOptionPages.size() == 1), modInfo, optionsList);
             }
         }
     }
 
-    protected void buildPageOptions(OptionPage page, CollapsedPageInfo collapsedInfo, VideoOptionsList.ModInfo modInfo) {
-        if(this.optionsList == null) {
-            throw new IllegalStateException("optionList is null trying to build page options");
-        }
-
-        if(!collapsedInfo.collapsed()) {
-            this.optionsList.addCategoryHeader(page.name(), modInfo);
-            this.buildGroupOptions(page.groups(), modInfo);
+    protected void buildPageOptions(OptionPage page, CollapsedPageInfo collapsedInfo, VideoOptionsList.ModInfo modInfo, VideoOptionsList optionsList) {
+        if(!collapsedInfo.collapsed() || ConfigOptions.USE_TABS.getValue()) {
+            optionsList.addCategoryHeader(page.name(), modInfo);
+            this.buildGroupOptions(page.groups(), modInfo, optionsList);
             return;
         }
 
@@ -255,24 +300,20 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
         }).build();
 
         if(collapsedInfo.onlyPageCollapsed()) {
-            this.optionsList.addBigOption(subPageButton, modInfo);
+            optionsList.addBigOption(subPageButton, modInfo);
         } else {
-            this.optionsList.addOption(subPageButton, modInfo);
+            optionsList.addOption(subPageButton, modInfo);
         }
     }
 
-    protected void buildGroupOptions(ImmutableList<OptionGroup> groups, VideoOptionsList.ModInfo modInfo) {
-        if(this.optionsList == null) {
-            throw new IllegalStateException("optionList is null trying to build group options");
-        }
-
+    protected void buildGroupOptions(ImmutableList<OptionGroup> groups, VideoOptionsList.ModInfo modInfo, VideoOptionsList optionsList) {
         for(OptionGroup group : groups) {
             if(group.name() != null) {
-                this.optionsList.addGroupName(group.name(), modInfo);
+                optionsList.addGroupName(group.name(), modInfo);
             }
             var groupOptions = group.options();
             for (Option option : groupOptions) {
-                this.optionsList.addOption(buildOptionWidget(option), modInfo);
+                optionsList.addOption(buildOptionWidget(option), modInfo);
             }
         }
     }
@@ -309,14 +350,25 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
         if(!this.optionWidgets.isEmpty()) {
             throw new IllegalStateException("visitOptionsAndAddListeners was called while optionWidgets list was not empty");
         }
-        if(this.optionsList == null) return;
-        this.optionsList.visitChildren(widget -> {
+        if(this.optionsList != null) {
+            this.visitOptionList(this.optionsList);
+        }
+        for (Map.Entry<String, OptionListTab> tabEntry : this.tabsByConfigId.entrySet()) {
+            this.visitOptionList(tabEntry.getValue().getOptionsList());
+        }
+    }
+
+    private void visitOptionList(VideoOptionsList optionsList) {
+        optionsList.visitChildren(widget -> {
             if(!(widget instanceof OptionWidget<?> optionWidget)) return;
             optionWidget.onChange(this::refreshOptionWidgetVisuals);
             this.optionWidgets.add(optionWidget);
         });
     }
 
+    protected Screen getNonVideoOptionsParent() {
+        return this.parent;
+    }
 
     @Override
     public boolean shouldCloseOnEsc() {
@@ -332,8 +384,8 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
         ConfigManager.CONFIG.applyAllOptions();
         if(this.refreshState.anyChanged(REFRESH_SCREEN_OPTIONS)) {
             Minecraft.getInstance().setScreen(create(
-                this.parent,
-                Objects.requireNonNull(this.optionsList, "Options list was null").scrollAmount()
+                this.getNonVideoOptionsParent(),
+                this.optionsList == null ? 0.0d : this.optionsList.scrollAmount()
             ));
         }
         this.refreshOptionWidgetValues();
@@ -459,6 +511,15 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
             );
         }
 
+        if(this.tabNavigationBar != null) {
+            this.tabNavigationBar.updateWidth(this.width);
+            int tabAreaTop = this.tabNavigationBar.getRectangle().bottom();
+            ScreenRectangle tabArea = new ScreenRectangle(0, tabAreaTop, this.width, this.height - this.layout.getFooterHeight() - tabAreaTop);
+            this.layout.setHeaderHeight(tabAreaTop);
+            this.layout.arrangeElements();
+            this.tabManager.setTabArea(tabArea);
+        }
+
         if(optionsList != null) {
             this.optionsList.setRectangle(
                 this.width,
@@ -491,9 +552,15 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
             Logging.error("{}", builder.toString());
 
             body.append("\n");
-            body.append(Component.literal(e.getMessage()).withStyle(
-                style -> style.withColor(CommonColors.GRAY)
-            ));
+            if(e.getMessage() == null) {
+                body.append(Component.literal("Check output log").withStyle(
+                    style -> style.withColor(CommonColors.GRAY)
+                ));
+            } else {
+                body.append(Component.literal(e.getMessage()).withStyle(
+                    style -> style.withColor(CommonColors.GRAY)
+                ));
+            }
         }
 
         body.append("\n\n");

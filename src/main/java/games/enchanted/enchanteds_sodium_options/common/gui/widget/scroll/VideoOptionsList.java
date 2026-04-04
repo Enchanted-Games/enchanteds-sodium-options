@@ -82,6 +82,12 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
         this.addChild(new GroupTitleEntry(header, modInfo));
     }
 
+    public void addSpacer(int height, ModInfo modInfo) {
+        trySetLastInCategoryOnBottomEntry(modInfo);
+        this.lastEntry = null;
+        this.addChild(new SpacerEntry(height, modInfo));
+    }
+
     public void trySetLastInCategoryOnBottomEntry(ModInfo info) {
         if(this.children().isEmpty()) return;
         if(this.children().getLast() instanceof OptionEntry entry && !entry.id.equals(info.id())) {
@@ -461,6 +467,21 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
         @Override
         protected int getTextColour() {
             return CommonColors.LIGHTER_GRAY;
+        }
+    }
+
+    static class SpacerEntry extends Entry {
+        final int height;
+
+        SpacerEntry(int height, ModInfo info) {
+            super(info);
+            this.setMargins(new Margin(0, 0));
+            this.height = height;
+        }
+
+        @Override
+        protected int height() {
+            return this.height;
         }
     }
 

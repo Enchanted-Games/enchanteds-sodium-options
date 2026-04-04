@@ -8,7 +8,7 @@ plugins {
 
 val minecraft = stonecutter.current.version
 val mcVersion = stonecutter.current.project.substringBeforeLast('-')
-val accessWidenerFilepath = "src/main/resources/${property("mod.id")}.accesswidener"
+val accessWidenerFilepath = "src/main/resources/${property("mod.id")}.classtweaker"
 
 val modVer = "${property("mod.version")}+${property("deps.sodium_compiled_against")}-mc${property("deps.minecraft")}-fabric"
 version = modVer
@@ -100,7 +100,7 @@ tasks.named<ProcessResources>("processResources") {
     }
 
     if(project.file(accessWidenerFilepath).exists()) {
-        props["accesswidener_field"] = "\"accessWidener\": \"${prop("mod.id")}.accesswidener\","
+        props["accesswidener_field"] = "\"accessWidener\": \"${prop("mod.id")}.classtweaker\","
     } else {
         props["accesswidener_field"] = ""
     }
