@@ -4,6 +4,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import games.enchanted.enchanteds_sodium_options.common.config.ConfigOptions;
 import games.enchanted.enchanteds_sodium_options.common.gui.widget.tab.ModInfoTabButton;
+import net.minecraft.client.gui.ActiveTextCollector;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -28,5 +29,17 @@ public abstract class TabButtonMixin extends AbstractWidget.WithInactiveMessage 
             return;
         }
         original.call(instance, graphics, font, color);
+    }
+
+    @WrapOperation(
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/TabButton;extractLabel(Lnet/minecraft/client/gui/ActiveTextCollector;)V"),
+        method = "extractWidgetRenderState"
+    )
+    private void enchanted_sodium_options$modifyLabel(TabButton instance, ActiveTextCollector output, Operation<Void> original, GuiGraphicsExtractor graphics) {
+        if((TabButton) (Object) this instanceof ModInfoTabButton modInfoTabButton && ConfigOptions.COLOURED_TAB_UNDERLINES.getValue()) {
+            modInfoTabButton.enchanted_sodium_options$extractLabel(graphics, output);
+            return;
+        }
+        original.call(instance, output);
     }
 }

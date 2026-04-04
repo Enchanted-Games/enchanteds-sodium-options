@@ -391,8 +391,6 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
                     iconSize,
                     iconSize,
                     iconSize,
-                    iconSize,
-                    iconSize,
                     this.monochromeIcon ? this.iconColour : -1
                 );
             }
