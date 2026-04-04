@@ -24,7 +24,10 @@ import java.util.function.Consumer;
 public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptionsList.Entry> {
     public static final Identifier LIST_BACKGROUND = Identifier.withDefaultNamespace("textures/gui/menu_list_background.png");
     public static final Identifier INWORLD_LIST_BACKGROUND = Identifier.withDefaultNamespace("textures/gui/inworld_menu_list_background.png");
+    public static final Identifier MENU_BACKGROUND = Identifier.withDefaultNamespace("textures/gui/menu_background.png");
+    private static final Identifier INWORLD_MENU_BACKGROUND = Identifier.withDefaultNamespace("textures/gui/inworld_menu_background.png");
     public static final int LIST_BACKGROUND_TEXTURE_SIZE = 32;
+    public static final int MENU_BACKGROUND_TEXTURE_SIZE = 16;
 
     public static final int DEFAULT_CHILD_HEIGHT = 25;
     public static final int DEFAULT_CHILD_WIDTH = 150;
@@ -121,41 +124,45 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
     }
 
     @Override
-    protected void renderBackground(GuiGraphicsExtractor GuiGraphicsExtractor, int mouseX, int mouseY, float partialTick) {
+    protected void renderBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
         boolean notInWorld = Minecraft.getInstance().level == null;
+        boolean useTabs = ConfigOptions.USE_TABS.getValue();
 
-        GuiGraphicsExtractor.blit(
+        graphics.blit(
             RenderPipelines.GUI_TEXTURED,
-            notInWorld ? LIST_BACKGROUND : INWORLD_LIST_BACKGROUND,
+            notInWorld ? (useTabs ? MENU_BACKGROUND : LIST_BACKGROUND) : (useTabs ? INWORLD_MENU_BACKGROUND : INWORLD_LIST_BACKGROUND),
             this.getX(),
             this.getY(),
             this.getRight(),
             this.getBottom() + (int)this.scrollAmount(),
             this.getWidth(),
             this.getHeight(),
-            LIST_BACKGROUND_TEXTURE_SIZE,
-            LIST_BACKGROUND_TEXTURE_SIZE
+            useTabs ? MENU_BACKGROUND_TEXTURE_SIZE : LIST_BACKGROUND_TEXTURE_SIZE,
+            useTabs ? MENU_BACKGROUND_TEXTURE_SIZE : LIST_BACKGROUND_TEXTURE_SIZE
         );
 
         int separatorTextureWidth = 32;
         int separatorTextureHeight = 2;
         int separatorHeight = 2;
 
-        Identifier headerSeparator = notInWorld ? Screen.HEADER_SEPARATOR : Screen.INWORLD_HEADER_SEPARATOR;
-        GuiGraphicsExtractor.blit(
-            RenderPipelines.GUI_TEXTURED,
-            headerSeparator,
-            this.getX(),
-            this.getY() - 2,
-            0.0F,
-            0.0F,
-            this.getWidth(),
-            separatorTextureHeight,
-            separatorTextureWidth,
-            separatorHeight
-        );
+        if(!useTabs) {
+            Identifier headerSeparator = notInWorld ? Screen.HEADER_SEPARATOR : Screen.INWORLD_HEADER_SEPARATOR;
+            graphics.blit(
+                RenderPipelines.GUI_TEXTURED,
+                headerSeparator,
+                this.getX(),
+                this.getY() - 2,
+                0.0F,
+                0.0F,
+                this.getWidth(),
+                separatorTextureHeight,
+                separatorTextureWidth,
+                separatorHeight
+            );
+        }
+
         Identifier footerSeparator = notInWorld ? Screen.FOOTER_SEPARATOR : Screen.INWORLD_FOOTER_SEPARATOR;
-        GuiGraphicsExtractor.blit(
+        graphics.blit(
             RenderPipelines.GUI_TEXTURED,
             footerSeparator,
             this.getX(),
@@ -168,7 +175,7 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
             separatorHeight
         );
 
-        renderScrollbarIcons(GuiGraphicsExtractor, mouseX, mouseY, partialTick);
+        renderScrollbarIcons(graphics, mouseX, mouseY, partialTick);
     }
 
     protected void renderScrollbarIcons(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {

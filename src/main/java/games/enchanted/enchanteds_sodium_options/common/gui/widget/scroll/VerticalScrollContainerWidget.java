@@ -1,10 +1,5 @@
 package games.enchanted.enchanteds_sodium_options.common.gui.widget.scroll;
 
-import games.enchanted.enchanteds_sodium_options.common.Logging;
-import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.resources.Identifier;
-import org.jspecify.annotations.Nullable;
-
 import games.enchanted.enchanteds_sodium_options.common.util.InputUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ComponentPath;
@@ -23,7 +18,9 @@ import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -11,10 +11,12 @@ import java.util.function.Consumer;
 public class OptionListTab implements Tab {
     protected final Component title;
     private final VideoOptionsList optionsList;
+    private final VideoOptionsList.ModInfo modInfo;
 
-    public OptionListTab(Component title) {
+    public OptionListTab(Component title, VideoOptionsList.ModInfo modInfo) {
         this.title = title;
         this.optionsList = new VideoOptionsList(0, 0, 0, 0);
+        this.modInfo = modInfo;
     }
 
     @Override
@@ -40,5 +42,9 @@ public class OptionListTab implements Tab {
 
     public VideoOptionsList getOptionsList() {
         return this.optionsList;
+    }
+
+    public VideoOptionsList.ModInfo getModInfo() {
+        return this.modInfo;
     }
 }

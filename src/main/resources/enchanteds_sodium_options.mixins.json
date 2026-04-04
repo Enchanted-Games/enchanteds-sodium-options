@@ -10,7 +10,9 @@
     "AbstractSliderButtonMixin",
     "AbstractWidgetMixin",
     "accessor.TabNavigationBarAccessor",
-    "sodium.VideoSettingsScreenMixin"
+    "sodium.VideoSettingsScreenMixin",
+    "widget.TabButtonMixin",
+    "widget.TabNavigationBarMixin"
   ],
   "injectors": {
     "defaultRequire": 1

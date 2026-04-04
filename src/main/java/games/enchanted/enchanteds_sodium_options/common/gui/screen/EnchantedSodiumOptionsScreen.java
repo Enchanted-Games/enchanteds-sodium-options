@@ -31,7 +31,9 @@ import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -217,7 +219,7 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
                     throw new IllegalStateException("Tried to create two tabs for the same config id '" + configId + "'!");
                 }
 
-                OptionListTab tab = new OptionListTab(modTitle);
+                OptionListTab tab = new OptionListTab(modTitle, modInfo);
                 this.tabsByConfigId.put(configId, tab);
 
                 VideoOptionsList optionsList = tab.getOptionsList();
@@ -446,14 +448,28 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
     }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, float partialTick) {
-        super.extractRenderState(guiGraphicsExtractor, mouseX, mouseY, partialTick);
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        if(ConfigOptions.USE_TABS.getValue()) {
+            graphics.blit(
+                RenderPipelines.GUI_TEXTURED,
+                CreateWorldScreen.TAB_HEADER_BACKGROUND,
+                0,
+                0,
+                0.0f,
+                0.0f,
+                this.width,
+                this.layout.getHeaderHeight(),
+                16,
+                16
+            );
+        }
+        super.extractRenderState(graphics, mouseX, mouseY, partialTick);
 
         if(this.tooltipState != null) {
             TooltipRenderHelper.renderTooltip(
                 this.extractTooltipRenderState(this.tooltipState),
                 this.font,
-                guiGraphicsExtractor,
+                graphics,
                 mouseX,
                 mouseY,
                 partialTick
