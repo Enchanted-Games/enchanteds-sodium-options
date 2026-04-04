@@ -22,16 +22,11 @@ public class SodiumConfigEntry implements ConfigEntryPoint {
             .setColorTheme(builder.createColorTheme().setBaseThemeRGB(ACCENT_COLOUR))
             .addPage(builder.createOptionPage()
                 .setName(Component.translatable("gui.enchanted_sodium_options.group.visual"))
-                .addOptionGroup(createSimpleGroup(builder, List.of(
-                    ConfigOptions.ACCENT_BARS,
-                    ConfigOptions.SHOW_MOD_ICONS,
-                    ConfigOptions.COLOURED_HEADER_TEXT,
-                    ConfigOptions.COLOURED_CATEGORY_TEXT
-                )))
+                .addOptionGroup(createVisualGroup(builder))
             )
             .addPage(builder.createOptionPage()
                 .setName(Component.translatable("gui.enchanted_sodium_options.group.behaviour"))
-                .addOptionGroup(createBehaviourGroup(builder))
+                .addOptionGroup(createLayoutGroup(builder))
             )
         ;
     }
@@ -44,7 +39,27 @@ public class SodiumConfigEntry implements ConfigEntryPoint {
         return group;
     }
 
-    private static OptionGroupBuilder createBehaviourGroup(ConfigBuilder builder) {
+    private static OptionGroupBuilder createVisualGroup(ConfigBuilder builder) {
+        var group = builder.createOptionGroup();
+        group.addOption(ConfigOptions.ACCENT_BARS.createSodiumOption(builder, group));
+        group.addOption(ConfigOptions.SHOW_MOD_ICONS.createSodiumOption(builder, group));
+        group.addOption(
+            ConfigOptions.COLOURED_HEADER_TEXT.createSodiumOption(builder, group).setEnabledProvider(
+                configState -> !configState.readBooleanOption(ConfigOptions.USE_TABS.getConfigId()),
+                ConfigOptions.USE_TABS.getConfigId()
+            )
+        );
+        group.addOption(ConfigOptions.COLOURED_CATEGORY_TEXT.createSodiumOption(builder, group));
+        group.addOption(
+            ConfigOptions.COLOURED_TAB_UNDERLINES.createSodiumOption(builder, group).setEnabledProvider(
+                configState -> configState.readBooleanOption(ConfigOptions.USE_TABS.getConfigId()),
+                ConfigOptions.USE_TABS.getConfigId()
+            )
+        );
+        return group;
+    }
+
+    private static OptionGroupBuilder createLayoutGroup(ConfigBuilder builder) {
         var group = builder.createOptionGroup();
         group.addOption(ConfigOptions.USE_TABS.createSodiumOption(builder, group));
         group.addOption(

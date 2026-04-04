@@ -43,6 +43,12 @@ public class ConfigOptions {
         "coloured_category_text"
     ));
 
+    public static final ConfigOption<Boolean> COLOURED_TAB_UNDERLINES = registerOption(new BoolOption(
+        true,
+        true,
+        "coloured_tab_underlines"
+    ));
+
     // behaviour
     public static final ConfigOption<Boolean> USE_TABS = registerOption(new BoolOption(
         false,

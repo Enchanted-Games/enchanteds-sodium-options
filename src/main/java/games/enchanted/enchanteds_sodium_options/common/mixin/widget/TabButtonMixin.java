@@ -2,6 +2,7 @@ package games.enchanted.enchanteds_sodium_options.common.mixin.widget;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import games.enchanted.enchanteds_sodium_options.common.config.ConfigOptions;
 import games.enchanted.enchanteds_sodium_options.common.gui.widget.tab.ModInfoTabButton;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -22,7 +23,7 @@ public abstract class TabButtonMixin extends AbstractWidget.WithInactiveMessage 
         method = "extractWidgetRenderState"
     )
     private void enchanted_sodium_options$modifyUnderlineColour(TabButton instance, GuiGraphicsExtractor graphics, Font font, int color, Operation<Void> original) {
-        if((Object) this instanceof ModInfoTabButton modInfoTabButton) {
+        if((TabButton) (Object) this instanceof ModInfoTabButton modInfoTabButton && ConfigOptions.COLOURED_TAB_UNDERLINES.getValue()) {
             original.call(instance, graphics, font, this.active ? modInfoTabButton.getModAccent() : color);
             return;
         }

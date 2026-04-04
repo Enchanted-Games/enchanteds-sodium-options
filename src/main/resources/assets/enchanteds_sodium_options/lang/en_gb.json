@@ -11,7 +11,7 @@
   "gui.enchanted_sodium_options.option.coloured_category_text": "Coloured Category Titles",
   "gui.enchanted_sodium_options.option.coloured_category_text.tooltip": "When enabled, mod accent colours will be used for config category titles.",
 
-  "gui.enchanted_sodium_options.group.behaviour": "Behaviour",
+  "gui.enchanted_sodium_options.group.behaviour": "Layout",
   "gui.enchanted_sodium_options.option.collapse_threshold": "Collapse Threshold",
   "gui.enchanted_sodium_options.option.collapse_threshold.value.collapse_all": "Collapse All",
   "gui.enchanted_sodium_options.option.collapse_threshold.tooltip": "The maximum amount of options a config category can have before its contents are collapsed into a sub-menu.\nThis does not apply until you close and re-open the video settings screen.",
