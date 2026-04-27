@@ -71,7 +71,7 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
 
     public final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
     protected @Nullable VideoOptionsList optionsList;
-    protected Map<String, OptionListTab> tabsByConfigId = new HashMap<>();
+    protected List<OptionListTab> modTabs = new ArrayList<>();
     protected final TabManager tabManager = new TabManager(this::addRenderableWidget, this::removeWidget);
     protected @Nullable TabNavigationBar tabNavigationBar;
 
@@ -142,7 +142,7 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
     protected void createTabsLayout() {
         this.buildSodiumOptionWidgets();
 
-        this.tabNavigationBar = new OptionListTabBar(this.width, this.tabManager, new ArrayList<>(this.tabsByConfigId.values()));
+        this.tabNavigationBar = new OptionListTabBar(this.width, this.tabManager, List.copyOf(this.modTabs));
         this.addRenderableWidget(this.tabNavigationBar);
         this.tabNavigationBar.selectTab(0, false);
 
@@ -214,13 +214,8 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
             Component modTitle = Component.literal(options.name());
 
             if(ConfigOptions.USE_TABS.getValue()) {
-                String configId = options.configId();
-                if(this.tabsByConfigId.containsKey(options.configId())) {
-                    throw new IllegalStateException("Tried to create two tabs for the same config id '" + configId + "'!");
-                }
-
                 OptionListTab tab = new OptionListTab(modTitle, modInfo);
-                this.tabsByConfigId.put(configId, tab);
+                this.modTabs.add(tab);
 
                 VideoOptionsList optionsList = tab.getOptionsList();
 
@@ -355,8 +350,8 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
         if(this.optionsList != null) {
             this.visitOptionList(this.optionsList);
         }
-        for (Map.Entry<String, OptionListTab> tabEntry : this.tabsByConfigId.entrySet()) {
-            this.visitOptionList(tabEntry.getValue().getOptionsList());
+        for (OptionListTab tab : this.modTabs) {
+            this.visitOptionList(tab.getOptionsList());
         }
     }
 
