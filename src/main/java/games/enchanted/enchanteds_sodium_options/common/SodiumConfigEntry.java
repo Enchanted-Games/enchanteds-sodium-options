@@ -49,6 +49,12 @@ public class SodiumConfigEntry implements ConfigEntryPoint {
                 ConfigOptions.USE_TABS.getConfigId()
             )
         );
+        group.addOption(
+            ConfigOptions.SHOW_MOD_VERSIONS.createSodiumOption(builder, group).setEnabledProvider(
+                configState -> !configState.readBooleanOption(ConfigOptions.USE_TABS.getConfigId()),
+                ConfigOptions.USE_TABS.getConfigId()
+            )
+        );
         group.addOption(ConfigOptions.COLOURED_CATEGORY_TEXT.createSodiumOption(builder, group));
         group.addOption(
             ConfigOptions.COLOURED_TAB_UNDERLINES.createSodiumOption(builder, group).setEnabledProvider(

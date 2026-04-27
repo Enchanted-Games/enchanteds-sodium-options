@@ -8,6 +8,8 @@
   "gui.enchanted_sodium_options.option.show_mod_icons.tooltip": "Whether mod icons should be shown in the config screen.",
   "gui.enchanted_sodium_options.option.coloured_header_text": "Colored Mod Titles",
   "gui.enchanted_sodium_options.option.coloured_header_text.tooltip": "When enabled, mod accent colors will be used for mod titles in the config screen.",
+  "gui.enchanted_sodium_options.option.show_mod_versions": "Show Mod Versions",
+  "gui.enchanted_sodium_options.option.show_mod_versions.tooltip": "Should mod versions be shown in the config menu next to the mod name",
   "gui.enchanted_sodium_options.option.coloured_category_text": "Colored Category Titles",
   "gui.enchanted_sodium_options.option.coloured_category_text.tooltip": "When enabled, mod accent colors will be used for config category titles.",
   "gui.enchanted_sodium_options.option.coloured_tab_underlines": "Coloured Tab Underline",

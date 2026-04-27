@@ -49,6 +49,12 @@ public class ConfigOptions {
         "coloured_tab_underlines"
     ));
 
+    public static final ConfigOption<Boolean> SHOW_MOD_VERSIONS = registerOption(new BoolOption(
+        false,
+        false,
+        "show_mod_versions"
+    ));
+
     // behaviour
     public static final ConfigOption<Boolean> USE_TABS = registerOption(new BoolOption(
         false,

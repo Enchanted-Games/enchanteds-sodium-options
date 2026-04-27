@@ -398,9 +398,11 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
             final boolean colouredText = ConfigOptions.COLOURED_HEADER_TEXT.getValue();
             graphics.text(this.font, this.title, this.getContentX() + iconSize + gap, this.getContentY(), colouredText ? this.titleColour : -1);
 
-            Component versionComponent = hovered ? this.version : this.truncatedVersion;
-            final int versionWidth = this.font.width(versionComponent);
-            graphics.text(this.font, versionComponent, this.getContentRight() - versionWidth, this.getContentY(), colouredText ? this.versionColour : CommonColors.LIGHT_GRAY);
+            if(ConfigOptions.SHOW_MOD_VERSIONS.getValue()) {
+                Component versionComponent = hovered ? this.version : this.truncatedVersion;
+                final int versionWidth = this.font.width(versionComponent);
+                graphics.text(this.font, versionComponent, this.getContentRight() - versionWidth, this.getContentY(), colouredText ? this.versionColour : CommonColors.LIGHT_GRAY);
+            }
         }
 
         @Override
