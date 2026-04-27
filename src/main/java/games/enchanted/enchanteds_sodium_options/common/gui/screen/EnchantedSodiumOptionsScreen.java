@@ -24,6 +24,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.SpriteIconButton;
 import net.minecraft.client.gui.components.tabs.TabManager;
 import net.minecraft.client.gui.components.tabs.TabNavigationBar;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
@@ -37,14 +38,13 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
 import net.minecraft.util.Util;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -52,6 +52,7 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
     private static final Component TITLE = Component.translatable("options.videoTitle");
     private static final Component DONATION_BUTTON_TEXT = Component.translatable("sodium.options.buttons.donate");
     protected static final int FOOTER_BUTTON_WIDTH = 98;
+    protected static final int ICON_BUTTON_SIZE = Button.DEFAULT_HEIGHT;
 
     private static final int TOOLTIP_WIDTH = 320;
     private static final int TOOLTIP_PADDING = 4;
@@ -169,15 +170,38 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
     }
 
     protected void createDonateAndShaderWidgets() {
-        this.donateButton = Button.builder(DONATION_BUTTON_TEXT, button -> {
+        final boolean useIconButtons = ConfigOptions.USE_TABS.getValue();
+
+        Button.OnPress donatePress = button -> {
             Util.getPlatform().openUri(ModConstants.SODIUM_DONATION);
-        }).width(FOOTER_BUTTON_WIDTH).build();
+        };
+        if(useIconButtons) {
+            this.donateButton = SpriteIconButton
+                .builder(DONATION_BUTTON_TEXT, donatePress, true)
+                .sprite(Identifier.fromNamespaceAndPath(ModConstants.MOD_ID, "icon/kofi"), 16, 16)
+                .width(ICON_BUTTON_SIZE)
+                .withTootip()
+                .build();
+        } else {
+            this.donateButton = Button.builder(DONATION_BUTTON_TEXT, donatePress).width(FOOTER_BUTTON_WIDTH).build();
+        }
         this.addRenderableWidget(this.donateButton);
 
-        this.shaderpacksButton = IrisShaderButtonBuilder.getInstance().createShaderpacksButton(this, FOOTER_BUTTON_WIDTH);
-        if(this.shaderpacksButton != null) {
-            this.addRenderableWidget(this.shaderpacksButton);
+        if(!IrisShaderButtonBuilder.getInstance().irisPresent()) return;
+
+
+        Button.OnPress shaderpacksOnPress = IrisShaderButtonBuilder.getInstance().createClickCallback(this);
+        if(useIconButtons) {
+            this.shaderpacksButton = SpriteIconButton
+                .builder(IrisShaderButtonBuilder.getInstance().getMessage(), shaderpacksOnPress, true)
+                .sprite(Identifier.fromNamespaceAndPath(ModConstants.MOD_ID, "icon/shaderpacks"), 16, 16)
+                .width(ICON_BUTTON_SIZE)
+                .withTootip()
+                .build();
+        } else {
+            this.shaderpacksButton = Button.builder(IrisShaderButtonBuilder.getInstance().getMessage(), shaderpacksOnPress).width(FOOTER_BUTTON_WIDTH).build();
         }
+        this.addRenderableWidget(this.shaderpacksButton);
     }
 
     protected void createFooterWidgets() {
@@ -506,19 +530,21 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
     @Override
     protected void repositionElements() {
         this.layout.arrangeElements();
-        int headerHeight = this.layout.getHeaderHeight();
+        final int headerHeight = this.layout.getHeaderHeight();
+        final boolean alignButtonsToTop = !ConfigOptions.USE_TABS.getValue();
+        final int bottomAlignedButtonY = this.layout.getHeight() - this.layout.getFooterHeight() + 7;
 
         if(this.shaderpacksButton != null) {
             this.shaderpacksButton.setPosition(
                 this.width - this.shaderpacksButton.getWidth() - 8,
-                (headerHeight / 2) - this.shaderpacksButton.getHeight() / 2
+                alignButtonsToTop ? (headerHeight / 2) - this.shaderpacksButton.getHeight() / 2 : bottomAlignedButtonY
             );
         }
 
         if(this.donateButton != null) {
             this.donateButton.setPosition(
                 8,
-                (headerHeight / 2) - this.donateButton.getHeight() / 2
+                alignButtonsToTop ? (headerHeight / 2) - this.donateButton.getHeight() / 2 : bottomAlignedButtonY
             );
         }
 
