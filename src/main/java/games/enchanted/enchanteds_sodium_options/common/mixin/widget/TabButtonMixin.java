@@ -5,7 +5,6 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import games.enchanted.enchanteds_sodium_options.common.config.ConfigOptions;
 import games.enchanted.enchanteds_sodium_options.common.gui.widget.tab.ModInfoTabButton;
 import net.minecraft.client.gui.ActiveTextCollector;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.TabButton;
@@ -20,15 +19,20 @@ public abstract class TabButtonMixin extends AbstractWidget.WithInactiveMessage 
     }
 
     @WrapOperation(
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/TabButton;extractFocusUnderline(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;I)V"),
-        method = "extractWidgetRenderState"
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;fill(IIIII)V"),
+        method = "extractFocusUnderline"
     )
-    private void enchanted_sodium_options$modifyUnderlineColour(TabButton instance, GuiGraphicsExtractor graphics, Font font, int color, Operation<Void> original) {
+    private void enchanted_sodium_options$modifyUnderlineColour(GuiGraphicsExtractor instance, int x0, int y0, int x1, int y1, int col, Operation<Void> original) {
         if((TabButton) (Object) this instanceof ModInfoTabButton modInfoTabButton && ConfigOptions.COLOURED_TAB_UNDERLINES.getValue()) {
-            original.call(instance, graphics, font, this.active ? modInfoTabButton.getModAccent() : color);
+            int newCol = this.active ? modInfoTabButton.getModAccent() : col;
+            int padding = ModInfoTabButton.PADDING + ModInfoTabButton.ICON_SIZE + ModInfoTabButton.PADDING;
+            int width = this.getWidth() - padding * 2;
+            int left = this.getX() + padding;
+            int top = this.getY() + this.getHeight() - 2;
+            original.call(instance, left, top, left + width, top + 1, newCol);
             return;
         }
-        original.call(instance, graphics, font, color);
+        original.call(instance, x0, y0, x1, y1, col);
     }
 
     @WrapOperation(
@@ -36,7 +40,7 @@ public abstract class TabButtonMixin extends AbstractWidget.WithInactiveMessage 
         method = "extractWidgetRenderState"
     )
     private void enchanted_sodium_options$modifyLabel(TabButton instance, ActiveTextCollector output, Operation<Void> original, GuiGraphicsExtractor graphics) {
-        if((TabButton) (Object) this instanceof ModInfoTabButton modInfoTabButton && ConfigOptions.COLOURED_TAB_UNDERLINES.getValue()) {
+        if((TabButton) (Object) this instanceof ModInfoTabButton modInfoTabButton) {
             modInfoTabButton.enchanted_sodium_options$extractLabel(graphics, output);
             return;
         }

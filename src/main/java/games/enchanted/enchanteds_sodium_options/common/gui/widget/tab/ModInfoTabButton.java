@@ -10,8 +10,8 @@ import net.minecraft.client.gui.components.tabs.TabManager;
 import net.minecraft.client.renderer.RenderPipelines;
 
 public class ModInfoTabButton extends TabButton {
-    static final int ICON_SIZE = 16;
-    static final int PADDING = 5;
+    public static final int ICON_SIZE = 16;
+    public static final int PADDING = 5;
 
     final VideoOptionsList.ModInfo modInfo;
 
