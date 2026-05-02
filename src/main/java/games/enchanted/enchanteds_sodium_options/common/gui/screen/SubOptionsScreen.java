@@ -34,6 +34,7 @@ public class SubOptionsScreen extends EnchantedSodiumOptionsScreen {
         }
 
         ImmutableList<OptionGroup> groups = page.groups();
+        this.optionsList.addSpacer(3, this.modInfo);
         this.buildGroupOptions(groups, this.modInfo, this.optionsList);
     }
 
