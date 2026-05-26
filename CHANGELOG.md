@@ -1,3 +1,3 @@
-# 1.2.1
+# 1.2.2
 
-- Updated to Sodium 0.8.11
+- Updated to Sodium 0.8.12
