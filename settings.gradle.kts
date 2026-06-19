@@ -30,7 +30,7 @@ stonecutter {
         ver("26.1", "fabric", "neoforge")
         ver("26.2", "fabric", "neoforge")
 
-        vcsVersion = "26.1-fabric"
+        vcsVersion = "26.2-fabric"
     }
 }
 
