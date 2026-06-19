@@ -142,11 +142,6 @@ public abstract class VerticalScrollContainerWidget<C extends VerticalScrollCont
     }
 
     @Override
-    protected double scrollRate() {
-        return 35;
-    }
-
-    @Override
     protected int scrollBarX() {
         return this.getRowRight() + Math.abs(this.getRowWidth() - this.getWidth()) / 2 - 1;
     }
