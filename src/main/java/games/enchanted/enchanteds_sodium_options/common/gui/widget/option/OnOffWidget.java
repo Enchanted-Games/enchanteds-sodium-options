@@ -1,13 +1,17 @@
 package games.enchanted.enchanteds_sodium_options.common.gui.widget.option;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.AbstractWidgetPreventTooltipRender;
 import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.TooltipContent;
 import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.TooltipConsumer;
+import games.enchanted.enchanteds_sodium_options.common.gui.widget.ResetOverlay;
 import games.enchanted.enchanteds_sodium_options.common.util.ComponentUtil;
 import net.caffeinemc.mods.sodium.client.config.structure.BooleanOption;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.input.InputWithModifiers;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.resources.Identifier;
@@ -17,6 +21,7 @@ import org.jspecify.annotations.Nullable;
 public class OnOffWidget extends Button implements OptionWidget<BooleanOption>, AbstractWidgetPreventTooltipRender {
     private static final Identifier DISABLED_SPRITE = Identifier.withDefaultNamespace("widget/button_disabled");
 
+    protected final ResetOverlay resetOverlay;
     protected final TooltipContent tooltipContent;
     protected final TooltipConsumer tooltipConsumer;
 
@@ -32,6 +37,8 @@ public class OnOffWidget extends Button implements OptionWidget<BooleanOption>, 
         this.option = option;
         this.value = option.getValidatedValue();
         updateMessage();
+
+        this.resetOverlay = new ResetOverlay(this, ResetOverlay.BUTTON_ICON_ID);
     }
 
     @Override
@@ -51,16 +58,31 @@ public class OnOffWidget extends Button implements OptionWidget<BooleanOption>, 
     }
 
     @Override
-    protected void extractContents(GuiGraphicsExtractor guiGraphicsExtractor, int mouseX, int mouseY, float partialTicks) {
+    protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
         if(this.isActive()) {
-            this.extractDefaultSprite(guiGraphicsExtractor);
+            this.extractDefaultSprite(graphics);
         } else {
-            guiGraphicsExtractor.blitSprite(RenderPipelines.GUI_TEXTURED, DISABLED_SPRITE, this.getX(), this.getY(), this.getWidth(), this.getHeight(), ARGB.white(this.alpha));
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, DISABLED_SPRITE, this.getX(), this.getY(), this.getWidth(), this.getHeight(), ARGB.white(this.alpha));
         }
-        this.extractDefaultLabel(guiGraphicsExtractor.textRendererForWidget(this, GuiGraphicsExtractor.HoveredTextEffects.NONE));
+        this.extractDefaultLabel(graphics.textRendererForWidget(this, GuiGraphicsExtractor.HoveredTextEffects.NONE));
+
+        if(this.isHovered() && Minecraft.getInstance().hasShiftDown() && this.isActive()) {
+            this.resetOverlay.extractRenderState(graphics, mouseX, mouseY, a);
+        }
+
         if(this.isHoveredOrFocused()) {
             this.tooltipConsumer.submitTooltipContent(this.tooltipContent, this.isHovered(), this.isFocused(), this.getRectangle());
         }
+    }
+
+    @Override
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        if(event.hasShiftDown() && event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
+            this.resetToDefault();
+            return true;
+        }
+
+        return super.mouseClicked(event, doubleClick);
     }
 
     @Override
@@ -80,7 +102,7 @@ public class OnOffWidget extends Button implements OptionWidget<BooleanOption>, 
 
     @Override
     public void refreshValue() {
-        this.value = option.getAppliedValue();
+        this.value = this.option.getValidatedValue();
         updateMessage();
     }
 

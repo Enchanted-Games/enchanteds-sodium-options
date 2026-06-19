@@ -34,6 +34,7 @@ import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -437,6 +438,13 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
             this.applyButton.active = false;
             this.doneButton.active = true;
         }
+    }
+
+    @Override
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        boolean val = super.mouseClicked(event, doubleClick);
+        this.updateFooterButtonState();
+        return val;
     }
 
     @Override

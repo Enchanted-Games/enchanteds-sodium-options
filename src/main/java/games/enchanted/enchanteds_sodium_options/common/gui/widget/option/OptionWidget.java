@@ -8,6 +8,12 @@ public interface OptionWidget<T extends Option> {
     default void refreshVisual() {}
     void onChange(OnChange changeCallback);
 
+    default void resetToDefault() {
+        this.getOption().resetToDefault();
+        this.refreshValue();
+        this.refreshVisual();
+    }
+
     @FunctionalInterface
     interface OnChange {
         void changed();

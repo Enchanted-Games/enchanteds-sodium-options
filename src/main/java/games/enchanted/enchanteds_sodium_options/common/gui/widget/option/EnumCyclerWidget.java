@@ -1,16 +1,21 @@
 package games.enchanted.enchanteds_sodium_options.common.gui.widget.option;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.AbstractWidgetPreventTooltipRender;
 import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.TooltipContent;
 import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.TooltipConsumer;
+import games.enchanted.enchanteds_sodium_options.common.gui.widget.ResetOverlay;
 import games.enchanted.enchanteds_sodium_options.common.util.ComponentUtil;
 import net.caffeinemc.mods.sodium.client.config.structure.EnumOption;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.input.InputWithModifiers;
+import net.minecraft.client.input.MouseButtonEvent;
 import org.jspecify.annotations.Nullable;
 
 public class EnumCyclerWidget<T extends Enum<T>> extends Button implements OptionWidget<EnumOption<T>>, AbstractWidgetPreventTooltipRender {
+    protected final ResetOverlay resetOverlay;
     protected final TooltipContent tooltipContent;
     protected final TooltipConsumer tooltipConsumer;
 
@@ -28,6 +33,8 @@ public class EnumCyclerWidget<T extends Enum<T>> extends Button implements Optio
         this.value = option.getValidatedValue();
         this.enumValues = this.getOption().enumClass.getEnumConstants();
         this.updateMessage();
+
+        this.resetOverlay = new ResetOverlay(this, ResetOverlay.BUTTON_ICON_ID);
     }
 
     @Override
@@ -47,18 +54,31 @@ public class EnumCyclerWidget<T extends Enum<T>> extends Button implements Optio
     }
 
     @Override
-    protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
+    protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
         this.extractDefaultSprite(graphics);
         this.extractDefaultLabel(graphics.textRendererForWidget(this, GuiGraphicsExtractor.HoveredTextEffects.NONE));
+
+        if(this.isHovered() && Minecraft.getInstance().hasShiftDown() && this.isActive()) {
+            this.resetOverlay.extractRenderState(graphics, mouseX, mouseY, a);
+        }
+
         if(this.isHoveredOrFocused()) {
             this.tooltipConsumer.submitTooltipContent(this.tooltipContent, this.isHovered(), this.isFocused(), this.getRectangle());
         }
     }
 
     @Override
-    public void onPress(InputWithModifiers input) {
-        boolean reverse = input.hasShiftDown();
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        if(event.hasShiftDown() && event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
+            this.resetToDefault();
+            return true;
+        }
 
+        return super.mouseClicked(event, doubleClick);
+    }
+
+    @Override
+    public void onPress(InputWithModifiers input) {
         int startIndex = 0;
         for (; startIndex < this.enumValues.length; startIndex++) {
             if (this.enumValues[startIndex] == this.value) {
@@ -68,7 +88,7 @@ public class EnumCyclerWidget<T extends Enum<T>> extends Button implements Optio
 
         int index = startIndex;
         do {
-            index = (index + (reverse ? this.enumValues.length - 1 : 1)) % this.enumValues.length;
+            index = (index + 1) % this.enumValues.length;
             this.value = this.enumValues[index];
         } while (!this.option.isValueAllowed(this.value));
 
@@ -86,7 +106,7 @@ public class EnumCyclerWidget<T extends Enum<T>> extends Button implements Optio
 
     @Override
     public void refreshValue() {
-        this.value = this.option.getAppliedValue();
+        this.value = this.option.getValidatedValue();
         this.updateMessage();
     }
 

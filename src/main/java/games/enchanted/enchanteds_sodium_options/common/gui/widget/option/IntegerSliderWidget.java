@@ -1,13 +1,16 @@
 package games.enchanted.enchanteds_sodium_options.common.gui.widget.option;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import games.enchanted.enchanteds_sodium_options.common.ModConstants;
 import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.AbstractWidgetPreventTooltipRender;
-import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.TooltipContent;
 import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.TooltipConsumer;
+import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.TooltipContent;
+import games.enchanted.enchanteds_sodium_options.common.gui.widget.ResetOverlay;
 import games.enchanted.enchanteds_sodium_options.common.gui.widget.extension.AbstractSliderButtonExtension;
 import games.enchanted.enchanteds_sodium_options.common.util.ComponentUtil;
 import net.caffeinemc.mods.sodium.api.config.option.SteppedValidator;
 import net.caffeinemc.mods.sodium.client.config.structure.IntegerOption;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Button;
@@ -20,6 +23,7 @@ import org.jspecify.annotations.Nullable;
 public class IntegerSliderWidget extends AbstractSliderButton implements AbstractSliderButtonExtension, OptionWidget<IntegerOption>, AbstractWidgetPreventTooltipRender {
     private static final Identifier DISABLED_HANDLE_SPRITE = Identifier.fromNamespaceAndPath(ModConstants.MOD_ID, "widget/slider_handle_disabled");
 
+    protected final ResetOverlay resetOverlay;
     protected final TooltipContent tooltipContent;
     protected final TooltipConsumer tooltipConsumer;
 
@@ -38,6 +42,8 @@ public class IntegerSliderWidget extends AbstractSliderButton implements Abstrac
         this.prevValue = this.realValue;
         this.setValue(this.getSliderValue());
         this.updateMessage();
+
+        this.resetOverlay = new ResetOverlay(this, ResetOverlay.SLIDER_ICON_ID);
     }
 
     @Override
@@ -58,8 +64,13 @@ public class IntegerSliderWidget extends AbstractSliderButton implements Abstrac
     }
 
     @Override
-    public void extractWidgetRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int mouseX, int mouseY, float partialTicks) {
-        super.extractWidgetRenderState(GuiGraphicsExtractor, mouseX, mouseY, partialTicks);
+    public void extractWidgetRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+        super.extractWidgetRenderState(graphics, mouseX, mouseY, a);
+
+        if(this.isHovered() && Minecraft.getInstance().hasShiftDown() && this.isActive()) {
+            this.resetOverlay.extractRenderState(graphics, mouseX, mouseY, a);
+        }
+
         if(this.isHoveredOrFocused()) {
             this.tooltipConsumer.submitTooltipContent(this.tooltipContent, this.isHovered(), this.isFocused(), this.getRectangle());
         }
@@ -95,6 +106,16 @@ public class IntegerSliderWidget extends AbstractSliderButton implements Abstrac
         int max = validator.max();
         int step = validator.step();
         return min + step * (int) Math.round(this.value * (max - min) / step);
+    }
+
+    @Override
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        if(event.hasShiftDown() && event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
+            this.resetToDefault();
+            return true;
+        }
+
+        return super.mouseClicked(event, doubleClick);
     }
 
     @Override
@@ -137,7 +158,7 @@ public class IntegerSliderWidget extends AbstractSliderButton implements Abstrac
 
     @Override
     public void refreshValue() {
-        this.realValue = option.getAppliedValue();
+        this.realValue = this.option.getValidatedValue();
         this.prevValue = this.realValue;
         this.setValue(getSliderValue(this.realValue));
     }
