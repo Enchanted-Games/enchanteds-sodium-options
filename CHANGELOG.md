@@ -1,3 +1,3 @@
-# 1.1.7
+# 1.1.8
 
-- Updated to Sodium 0.8.12
+- Updated version constraints to allow the mod to load with Sodium 0.8.13
