@@ -14,7 +14,8 @@ import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(TabNavigationBar.class)
 public class TabNavigationBarMixin {
-    @WrapOperation(
+    //? if minecraft: <= 26.1 {
+    /*@WrapOperation(
         at = @At(value = "NEW", target = "(Lnet/minecraft/client/gui/components/tabs/TabManager;Lnet/minecraft/client/gui/components/tabs/Tab;II)Lnet/minecraft/client/gui/components/TabButton;"),
         method = "<init>"
     )
@@ -33,4 +34,5 @@ public class TabNavigationBarMixin {
         }
         return original.call(tabManager, tab, width, height);
     }
+    *///? }
 }

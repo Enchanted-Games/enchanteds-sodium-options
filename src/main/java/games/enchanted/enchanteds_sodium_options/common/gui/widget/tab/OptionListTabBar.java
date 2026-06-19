@@ -1,6 +1,7 @@
 package games.enchanted.enchanteds_sodium_options.common.gui.widget.tab;
 
 import com.google.common.collect.ImmutableList;
+import games.enchanted.enchanteds_sodium_options.common.gui.screen.OptionListTab;
 import games.enchanted.enchanteds_sodium_options.common.mixin.accessor.TabNavigationBarAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -15,7 +16,18 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
-public class OptionListTabBar extends TabNavigationBar {
+//? if minecraft: >= 26.2 {
+import net.minecraft.client.gui.components.tabs.MenuTabBar;
+import net.minecraft.client.gui.layouts.FrameLayout;
+//? }
+
+public class OptionListTabBar
+    //? if minecraft: <= 26.1 {
+    /*extends TabNavigationBar
+    *///? } else {
+    extends MenuTabBar
+    //? }
+{
     protected final int INLINE_MARGIN = 24;
     protected final int TAB_INLINE_PADDING = 10;
     protected final int MIN_TAB_WIDTH = 100;
@@ -25,16 +37,40 @@ public class OptionListTabBar extends TabNavigationBar {
     protected int maxHorizontalScrollAmount = 0;
 
     public OptionListTabBar(int width, TabManager tabManager, Iterable<Tab> tabs) {
-        super(width, tabManager, tabs);
+        //? if minecraft: <= 26.1 {
+        /*super(width, tabManager, tabs);
+        *///? } else {
+        super(0, 0, width, 24, tabManager, createButtons(tabs, tabManager), ImmutableList.copyOf(tabs));
+        //? }
         for(TabButton tab : ((TabNavigationBarAccessor) this).enchanted_sodium_options$tabButtons()) {
             tab.setTooltip(Tooltip.create(tab.tab().getTabTitle()));
         }
     }
 
+    private static ImmutableList<TabButton> createButtons(Iterable<Tab> tabs, TabManager tabManager) {
+        ImmutableList.Builder<TabButton> tabButtonsBuilder = ImmutableList.builder();
+
+        for(Tab tab : tabs) {
+            if(tab instanceof OptionListTab optionListTab) {
+                tabButtonsBuilder.add(new ModInfoTabButton(tabManager, tab, 0, 24, optionListTab.getModInfo()));
+            }
+        }
+
+        return tabButtonsBuilder.build();
+    }
+
+
+
     @Override
-    public void arrangeElements() {
+    public void arrangeElements(
+        //? if minecraft: >= 26.2 {
+        int width
+        //? }
+    ) {
         final ImmutableList<TabButton> tabs = ((TabNavigationBarAccessor) this).enchanted_sodium_options$tabButtons();
-        final int width = ((TabNavigationBarAccessor) this).enchanted_sodium_options$width();
+        //? if minecraft: <= 26.1 {
+        /*final int width = ((TabNavigationBarAccessor) this).enchanted_sodium_options$width();
+        *///? }
         final int scaledWidth = Math.min(width, MAX_SCROLL_AREA);
         final int paddedWidth = scaledWidth - (INLINE_MARGIN * 2);
 
@@ -103,7 +139,12 @@ public class OptionListTabBar extends TabNavigationBar {
     }
 
     protected void scrollIntoView(TabButton button) {
-        final int width = ((TabNavigationBarAccessor) this).enchanted_sodium_options$width();
+        final int width =
+            //? if minecraft: <= 26.1 {
+            /*((TabNavigationBarAccessor) this).enchanted_sodium_options$width();
+            *///? } else {
+            this.width;
+            //? }
 
         if (button.getX() < INLINE_MARGIN) {
             this.setHorizontalScrollAmount(this.horizontalScrollAmount - (INLINE_MARGIN - button.getX()));

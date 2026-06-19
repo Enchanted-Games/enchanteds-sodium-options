@@ -12,7 +12,8 @@ import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(AbstractWidget.class)
 public abstract class AbstractWidgetMixin {
-    @WrapOperation(
+    //? if minecraft: <= 26.1 {
+    /*@WrapOperation(
         at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/WidgetTooltipHolder;refreshTooltipForNextRenderPass(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIZZLnet/minecraft/client/gui/navigation/ScreenRectangle;)V"),
         method = "extractRenderState"
     )
@@ -22,4 +23,16 @@ public abstract class AbstractWidgetMixin {
         }
         original.call(instance, GuiGraphicsExtractor, mouseX, mouseY, hovering, focused, screenRectangle);
     }
+    *///? } else {
+    @WrapOperation(
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/AbstractWidget;extractTooltipForNextRenderPass(Lnet/minecraft/client/gui/GuiGraphicsExtractor;II)V"),
+        method = "extractRenderState"
+    )
+    private void preventTooltipRender(AbstractWidget instance, GuiGraphicsExtractor graphics, int mouseX, int mouseY, Operation<Void> original) {
+        if(((Object) this) instanceof AbstractWidgetPreventTooltipRender extension && extension.enchanteds_sodium_options$preventTooltipRender()) {
+            return;
+        }
+        original.call(instance, graphics, mouseX, mouseY);
+    }
+    //? }
 }

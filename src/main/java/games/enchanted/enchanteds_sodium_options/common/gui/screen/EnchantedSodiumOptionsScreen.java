@@ -16,6 +16,7 @@ import games.enchanted.enchanteds_sodium_options.common.gui.widget.scroll.VideoO
 import games.enchanted.enchanteds_sodium_options.common.gui.widget.tab.OptionListTabBar;
 import games.enchanted.enchanteds_sodium_options.common.mixin.accessor.sodium.OptionAccessor;
 import games.enchanted.enchanteds_sodium_options.common.util.ComponentUtil;
+import games.enchanted.enchanteds_sodium_options.common.util.ScreenUtil;
 import net.caffeinemc.mods.sodium.client.config.ConfigManager;
 import net.caffeinemc.mods.sodium.client.config.structure.*;
 import net.caffeinemc.mods.sodium.client.gui.VideoSettingsScreen;
@@ -137,7 +138,7 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
             this.repositionElements();
         }
         catch (Exception e) {
-            Minecraft.getInstance().setScreen(createErrorScreen(e, this.parent));
+            ScreenUtil.setScreen(this.minecraft, createErrorScreen(e, this.parent));
         }
     }
 
@@ -318,7 +319,7 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
         }
 
         AbstractWidget subPageButton = Button.builder(ComponentUtil.appendEllipsis(page.name()), button -> {
-            this.minecraft.setScreen(new SubOptionsScreen(page, this, modInfo));
+            ScreenUtil.setScreen(this.minecraft, new SubOptionsScreen(page, this, modInfo));
         }).build();
 
         if(collapsedInfo.onlyPageCollapsed()) {
@@ -405,7 +406,7 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
     private void saveChanges() {
         ConfigManager.CONFIG.applyAllOptions();
         if(this.refreshState.anyChanged(REFRESH_SCREEN_OPTIONS)) {
-            Minecraft.getInstance().setScreen(create(
+            ScreenUtil.setScreen(this.minecraft, create(
                 this.getNonVideoOptionsParent(),
                 this.optionsList == null ? 0.0d : this.optionsList.scrollAmount()
             ));
@@ -450,7 +451,7 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
     @Override
     public boolean keyPressed(KeyEvent event) {
         if(this.shouldOpenSodiumScreenOnKeybind() && event.hasAltDown() && event.key() == InputConstants.KEY_P) {
-            Minecraft.getInstance().setScreen(createSodiumScreen(this.parent));
+            ScreenUtil.setScreen(this.minecraft, createSodiumScreen(this.parent));
             return true;
         }
         return super.keyPressed(event);
@@ -462,7 +463,7 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
 
     @Override
     public void onClose() {
-        this.minecraft.setScreen(parent);
+        ScreenUtil.setScreen(this.minecraft, parent);
     }
 
 
@@ -557,7 +558,12 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
         }
 
         if(this.tabNavigationBar != null) {
-            this.tabNavigationBar.updateWidth(this.width);
+            //? if minecraft: <= 26.1 {
+            /*this.tabNavigationBar.updateWidth(this.width);
+            *///? } else {
+            this.tabNavigationBar.setWidth(this.width);
+            this.tabNavigationBar.arrangeElements(this.width);
+            //? }
             int tabAreaTop = this.tabNavigationBar.getRectangle().bottom();
             ScreenRectangle tabArea = new ScreenRectangle(0, tabAreaTop, this.width, this.height - this.layout.getFooterHeight() - tabAreaTop);
             this.layout.setHeaderHeight(tabAreaTop);
@@ -620,7 +626,7 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
                 if(confirmed) {
                     Util.getPlatform().openUri(ModConstants.ISSUE_URI);
                 } else {
-                    Minecraft.getInstance().setScreen(EnchantedSodiumOptionsScreen.createSodiumScreen(parent));
+                    ScreenUtil.setScreen(Minecraft.getInstance(), EnchantedSodiumOptionsScreen.createSodiumScreen(parent));
                 }
             },
             ComponentUtil.MOD_NAME,

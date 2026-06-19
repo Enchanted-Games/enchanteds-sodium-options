@@ -12,7 +12,13 @@ import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-@Mixin(TabButton.class)
+//? if minecraft: <= 26.1 {
+/*@Mixin(TabButton.class)
+*///? } else {
+import net.minecraft.client.gui.components.tabs.MenuTabBar;
+
+@Mixin(MenuTabBar.MenuTabButton.class)
+//? }
 public abstract class TabButtonMixin extends AbstractWidget.WithInactiveMessage {
     public TabButtonMixin(int x, int y, int width, int height, Component message) {
         super(x, y, width, height, message);
@@ -20,7 +26,11 @@ public abstract class TabButtonMixin extends AbstractWidget.WithInactiveMessage 
 
     @WrapOperation(
         at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;fill(IIIII)V"),
-        method = "extractFocusUnderline"
+        //? if minecraft: <= 26.1 {
+        /*method = "extractFocusUnderline"
+        *///? } else {
+        method = "renderFocusUnderline"
+        //? }
     )
     private void enchanted_sodium_options$modifyUnderlineColour(GuiGraphicsExtractor instance, int x0, int y0, int x1, int y1, int col, Operation<Void> original) {
         if((TabButton) (Object) this instanceof ModInfoTabButton modInfoTabButton && ConfigOptions.COLOURED_TAB_UNDERLINES.getValue()) {
@@ -36,10 +46,23 @@ public abstract class TabButtonMixin extends AbstractWidget.WithInactiveMessage 
     }
 
     @WrapOperation(
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/TabButton;extractLabel(Lnet/minecraft/client/gui/ActiveTextCollector;)V"),
+        at = @At(
+            value = "INVOKE",
+            //? if minecraft: <= 26.1 {
+            /*target = "Lnet/minecraft/client/gui/components/TabButton;extractLabel(Lnet/minecraft/client/gui/ActiveTextCollector;)V"
+            *///? } else {
+            target = "Lnet/minecraft/client/gui/components/tabs/MenuTabBar$MenuTabButton;renderLabel(Lnet/minecraft/client/gui/ActiveTextCollector;)V"
+            //? }
+        ),
         method = "extractWidgetRenderState"
     )
-    private void enchanted_sodium_options$modifyLabel(TabButton instance, ActiveTextCollector output, Operation<Void> original, GuiGraphicsExtractor graphics) {
+    private void enchanted_sodium_options$modifyLabel(
+        //? if minecraft: <= 26.1 {
+        /*TabButton instance, ActiveTextCollector output, Operation<Void> original, GuiGraphicsExtractor graphics
+        *///? } else {
+        MenuTabBar.MenuTabButton instance, ActiveTextCollector output, Operation<Void> original, GuiGraphicsExtractor graphics
+        //? }
+    ) {
         if((TabButton) (Object) this instanceof ModInfoTabButton modInfoTabButton) {
             modInfoTabButton.enchanted_sodium_options$extractLabel(graphics, output);
             return;

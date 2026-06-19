@@ -9,7 +9,17 @@ import net.minecraft.client.gui.components.tabs.Tab;
 import net.minecraft.client.gui.components.tabs.TabManager;
 import net.minecraft.client.renderer.RenderPipelines;
 
-public class ModInfoTabButton extends TabButton {
+//? if minecraft: >= 26.2 {
+import net.minecraft.client.gui.components.tabs.MenuTabBar;
+//?}
+
+public class ModInfoTabButton
+    //? if minecraft: <= 26.1 {
+    /*extends TabButton
+    *///? } else {
+    extends MenuTabBar.MenuTabButton
+    //? }
+{
     public static final int ICON_SIZE = 16;
     public static final int PADDING = 5;
 
