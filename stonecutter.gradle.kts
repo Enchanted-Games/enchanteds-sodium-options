@@ -4,7 +4,7 @@ plugins {
     id("net.fabricmc.fabric-loom-remap") version "1.15-SNAPSHOT" apply false
     id("net.fabricmc.fabric-loom") version "1.15-SNAPSHOT" apply false
     id("net.neoforged.moddev") version "2.0.141" apply false
-    id("me.modmuss50.mod-publish-plugin") version "0.8.+" apply false
+    id("me.modmuss50.mod-publish-plugin") version "2.0.+" apply false
 }
 
 stonecutter active "26.2-fabric" /* You may have to edit this. Make sure it matches one of the versions present in settings.gradle.kts */
