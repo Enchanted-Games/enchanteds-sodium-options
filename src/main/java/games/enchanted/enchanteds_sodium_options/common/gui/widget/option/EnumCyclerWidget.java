@@ -71,6 +71,7 @@ public class EnumCyclerWidget<T extends Enum<T>> extends Button implements Optio
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
         if(event.hasShiftDown() && event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
             this.resetToDefault();
+            this.playDownSound(Minecraft.getInstance().getSoundManager());
             return true;
         }
 
