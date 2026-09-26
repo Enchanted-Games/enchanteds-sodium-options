@@ -34,7 +34,7 @@ public abstract class VerticalScrollContainerWidget<C extends VerticalScrollCont
     private static final Identifier SCROLLER_BACKGROUND_SPRITE = Identifier.withDefaultNamespace("widget/scroller_background");
     private static final int SCROLLBAR_MIN_HEIGHT = 32;
     private static final int DEFAULT_SCROLLBAR_WIDTH = 6;
-    private static final int DEFAULT_SCROLL_RATE = 6;
+    private static final int DEFAULT_SCROLL_RATE = 12;
 
     private final List<C> children = new ArrayList<>();
     @Nullable private C hoveredChild = null;
