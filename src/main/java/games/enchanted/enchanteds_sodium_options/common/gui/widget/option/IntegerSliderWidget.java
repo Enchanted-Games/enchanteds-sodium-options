@@ -60,6 +60,7 @@ public class IntegerSliderWidget extends AbstractSliderButton implements Abstrac
             this.option.hasChanged()
         );
         this.tooltipContent.setOptionValue(this.message);
+        this.tooltipContent.setBody(this.option.getTooltipProvider().apply(this.realValue));
         this.setTooltip(this.tooltipContent.tooltipForNarration());
     }
 

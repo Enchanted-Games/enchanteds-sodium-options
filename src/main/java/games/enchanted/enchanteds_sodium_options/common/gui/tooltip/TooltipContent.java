@@ -10,14 +10,14 @@ import org.jspecify.annotations.Nullable;
 import java.util.List;
 
 public class TooltipContent {
-    private final Component body;
+    private Component body;
     private Component optionValue;
     private @Nullable final Component performanceImpact;
 
     private int prevSplitWidth = 0;
     private @Nullable List<FormattedCharSequence> splitBody;
 
-    public TooltipContent(Component body, Component optionValue,@Nullable  Component performanceImpact) {
+    public TooltipContent(Component body, Component optionValue, @Nullable Component performanceImpact) {
         this.body = body;
         this.optionValue = optionValue;
         this.performanceImpact = performanceImpact;
@@ -25,6 +25,11 @@ public class TooltipContent {
 
     public void setOptionValue(Component value) {
         this.optionValue = value;
+    }
+
+    public void setBody(Component body) {
+        this.body = body;
+        this.splitBody = null;
     }
 
     public @Nullable Component getPerformanceImpact() {

@@ -54,6 +54,7 @@ public class OnOffWidget extends Button implements OptionWidget<BooleanOption>, 
             this.option.hasChanged()
         );
         this.tooltipContent.setOptionValue(this.message);
+        this.tooltipContent.setBody(this.option.getTooltipProvider().apply(this.value));
         this.setTooltip(this.tooltipContent.tooltipForNarration());
     }
 
