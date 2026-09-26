@@ -33,7 +33,12 @@ public class TooltipRenderHelper {
             effectiveHeight - TooltipRenderUtil.PADDING_TOP - TooltipRenderUtil.PADDING_BOTTOM,
             null
         );
-        if(InputConstants.isKeyDown(Minecraft.getInstance().getWindow(), InputConstants.KEY_RSHIFT)) {
+        if(InputConstants.isKeyDown(
+            //? if minecraft: <= 26.2 {
+            /*Minecraft.getInstance().getWindow(),
+             *///? }
+            InputConstants.KEY_RSHIFT
+        )) {
             graphics.blitSprite(
                 RenderPipelines.GUI_TEXTURED,
                 TOOLTIP_BACKGROUND,

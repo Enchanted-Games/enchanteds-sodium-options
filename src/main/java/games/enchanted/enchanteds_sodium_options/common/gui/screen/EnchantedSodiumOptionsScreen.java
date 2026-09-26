@@ -1,6 +1,7 @@
 package games.enchanted.enchanteds_sodium_options.common.gui.screen;
 
 import com.google.common.collect.ImmutableList;
+import com.mojang.blaze3d.Blaze3D;
 import com.mojang.blaze3d.platform.InputConstants;
 import games.enchanted.enchanteds_sodium_options.common.Logging;
 import games.enchanted.enchanteds_sodium_options.common.ModConstants;
@@ -173,7 +174,11 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
 
     protected void createDonateAndShaderWidgets() {
         Button.OnPress donatePress = button -> {
-            Util.getPlatform().openUri(ModConstants.SODIUM_DONATION);
+            //? if minecraft: <= 26.2 {
+            /*Util.getPlatform().openUri(ModConstants.SODIUM_DONATION);
+            *///? } else {
+            Blaze3D.openUri(ModConstants.SODIUM_DONATION);
+            //? }
         };
         this.donateButton = SpriteIconButton
             .builder(DONATION_BUTTON_TEXT, donatePress, true)
@@ -614,7 +619,11 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
         return new ConfirmScreen(
             confirmed -> {
                 if(confirmed) {
-                    Util.getPlatform().openUri(ModConstants.ISSUE_URI);
+                    //? if minecraft: <= 26.2 {
+                    /*Util.getPlatform().openUri(ModConstants.ISSUE_URI);
+                    *///? } else {
+                    Blaze3D.openUri(ModConstants.ISSUE_URI);
+                    //? }
                 } else {
                     ScreenUtil.setScreen(Minecraft.getInstance(), EnchantedSodiumOptionsScreen.createSodiumScreen(parent));
                 }

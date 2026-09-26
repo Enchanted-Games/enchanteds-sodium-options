@@ -16,6 +16,11 @@ public class InputUtil {
 
     public static boolean shouldShowDebugWidgetBound() {
         if(!PlatformHelper.isDevelopmentEnvironment()) return false;
-        return InputConstants.isKeyDown(Minecraft.getInstance().getWindow(), InputConstants.KEY_RSHIFT);
+        return InputConstants.isKeyDown(
+            //? if minecraft: <= 26.2 {
+            /*Minecraft.getInstance().getWindow(),
+            *///? }
+            InputConstants.KEY_RSHIFT
+        );
     }
 }
