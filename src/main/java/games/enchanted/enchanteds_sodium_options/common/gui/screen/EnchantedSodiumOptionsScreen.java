@@ -172,37 +172,27 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
     }
 
     protected void createDonateAndShaderWidgets() {
-        final boolean useIconButtons = ConfigOptions.USE_TABS.getValue();
-
         Button.OnPress donatePress = button -> {
             Util.getPlatform().openUri(ModConstants.SODIUM_DONATION);
         };
-        if(useIconButtons) {
-            this.donateButton = SpriteIconButton
-                .builder(DONATION_BUTTON_TEXT, donatePress, true)
-                .sprite(Identifier.fromNamespaceAndPath(ModConstants.MOD_ID, "icon/kofi"), 16, 16)
-                .width(ICON_BUTTON_SIZE)
-                .withTootip()
-                .build();
-        } else {
-            this.donateButton = Button.builder(DONATION_BUTTON_TEXT, donatePress).width(FOOTER_BUTTON_WIDTH).build();
-        }
+        this.donateButton = SpriteIconButton
+            .builder(DONATION_BUTTON_TEXT, donatePress, true)
+            .sprite(Identifier.fromNamespaceAndPath(ModConstants.MOD_ID, "icon/kofi"), 16, 16)
+            .width(ICON_BUTTON_SIZE)
+            .withTootip()
+            .build();
         this.addRenderableWidget(this.donateButton);
 
         if(!IrisShaderButtonBuilder.getInstance().irisPresent()) return;
 
 
         Button.OnPress shaderpacksOnPress = IrisShaderButtonBuilder.getInstance().createClickCallback(this);
-        if(useIconButtons) {
-            this.shaderpacksButton = SpriteIconButton
-                .builder(IrisShaderButtonBuilder.getInstance().getMessage(), shaderpacksOnPress, true)
-                .sprite(Identifier.fromNamespaceAndPath(ModConstants.MOD_ID, "icon/shaderpacks"), 16, 16)
-                .width(ICON_BUTTON_SIZE)
-                .withTootip()
-                .build();
-        } else {
-            this.shaderpacksButton = Button.builder(IrisShaderButtonBuilder.getInstance().getMessage(), shaderpacksOnPress).width(FOOTER_BUTTON_WIDTH).build();
-        }
+        this.shaderpacksButton = SpriteIconButton
+            .builder(IrisShaderButtonBuilder.getInstance().getMessage(), shaderpacksOnPress, true)
+            .sprite(Identifier.fromNamespaceAndPath(ModConstants.MOD_ID, "icon/shaderpacks"), 16, 16)
+            .width(ICON_BUTTON_SIZE)
+            .withTootip()
+            .build();
         this.addRenderableWidget(this.shaderpacksButton);
     }
 
@@ -540,7 +530,7 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
     protected void repositionElements() {
         this.layout.arrangeElements();
         final int headerHeight = this.layout.getHeaderHeight();
-        final boolean alignButtonsToTop = !ConfigOptions.USE_TABS.getValue();
+        final boolean alignButtonsToTop = false;
         final int bottomAlignedButtonY = this.layout.getHeight() - this.layout.getFooterHeight() + 7;
 
         if(this.shaderpacksButton != null) {
