@@ -57,8 +57,8 @@ public class ConfigOptions {
 
     // behaviour
     public static final ConfigOption<Boolean> USE_TABS = registerOption(new BoolOption(
-        false,
-        false,
+        true,
+        true,
         "use_tabs"
     ));
 

@@ -240,7 +240,7 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
 
                 VideoOptionsList optionsList = tab.getOptionsList();
 
-                optionsList.addSpacer(3, modInfo);
+                optionsList.addSpacer(6, modInfo);
 
                 this.buildPages(options.pages(), modInfo, optionsList);
             }

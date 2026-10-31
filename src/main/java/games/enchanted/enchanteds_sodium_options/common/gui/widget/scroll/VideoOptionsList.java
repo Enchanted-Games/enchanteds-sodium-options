@@ -76,7 +76,10 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
     public void addCategoryHeader(Component header, ModInfo modInfo) {
         trySetLastInCategoryOnBottomEntry(modInfo);
         this.lastEntry = null;
-        this.addChild(new CategoryHeaderEntry(header, modInfo));
+        boolean hasExtraTopPadding =
+            this.children().getLast() instanceof ModTitleEntry ||
+            ConfigOptions.USE_TABS.getValue() && this.children().size() == 1 && this.children().getFirst() instanceof SpacerEntry;
+        this.addChild(new CategoryHeaderEntry(header, modInfo, hasExtraTopPadding));
     }
 
     public void addGroupName(Component header, ModInfo modInfo) {
@@ -355,14 +358,14 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
 
         ModTitleEntry(Component title, String version, @Nullable Identifier icon, boolean monochromeIcon, ModInfo info) {
             super(info);
-            setMargins(new Margin(8, 3, CategoryHeaderEntry.LEFT_TEXT_OFFSET, 0));
-            this.title = title;
+            setMargins(new Margin(8, 0, CategoryHeaderEntry.LEFT_TEXT_OFFSET, 0));
+            this.title = title.copy().withStyle(style -> style.withBold(true));
             this.icon = icon;
             this.version = ComponentUtil.versionString(version);
             this.truncatedVersion = ComponentUtil.versionString(version.split("\\+")[0]);
             this.monochromeIcon = monochromeIcon;
             this.iconColour = info.theme().themeLighter;
-            this.titleColour = info.theme().themeLighter;
+            this.titleColour = info.theme().theme;
             this.versionColour = info.theme().themeDarker;
         }
 
@@ -418,19 +421,19 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
         final Component title;
         final int textColour;
 
-        CategoryHeaderEntry(Component header, ModInfo info) {
-            this(header, info, info.theme().theme);
+        CategoryHeaderEntry(Component header, ModInfo info, boolean hasLessTopPadding) {
+            this(header, info, info.theme().themeLighter, hasLessTopPadding);
         }
 
-        CategoryHeaderEntry(Component header, ModInfo info, int textColour) {
+        CategoryHeaderEntry(Component header, ModInfo info, int textColour, boolean hasLessTopPadding) {
             super(info);
-            setMargins(new Margin(2, 0, LEFT_TEXT_OFFSET, 0));
-            this.title = header;
+            setMargins(new Margin(hasLessTopPadding ? 2 : 12, 2, LEFT_TEXT_OFFSET, 0));
+            this.title = header.copy().withStyle(style -> style.withBold(true).withUnderlined(true));
             this.textColour = textColour;
         }
 
         protected int getTextColour() {
-            return ConfigOptions.COLOURED_CATEGORY_TEXT.getValue() ? this.textColour : CommonColors.TEXT_GRAY;
+            return ConfigOptions.COLOURED_CATEGORY_TEXT.getValue() ? this.textColour : CommonColors.WHITE;
         }
 
         @Override
@@ -442,10 +445,10 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
         public void extractContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
             super.extractContent(graphics, mouseX, mouseY, hovered, partialTick);
 
-            graphics.text(
+            graphics.centeredText(
                 this.font,
                 this.title,
-                this.getContentX(),
+                this.getContentXMiddle(),
                 this.getContentY(),
                 this.getTextColour()
             );
@@ -454,7 +457,7 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
 
     static class GroupTitleEntry extends CategoryHeaderEntry {
         GroupTitleEntry(Component header, ModInfo info) {
-            super(header, info, CommonColors.TEXT_GRAY);
+            super(header, info, CommonColors.TEXT_GRAY, false);
             setMargins(new Margin(4, 0, 14, 0));
         }
 
