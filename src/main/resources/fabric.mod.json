@@ -8,12 +8,13 @@
     "Enchanted_Games"
   ],
   "contact": {
+    "homepage": "${website_url}",
     "sources": "${source_url}",
     "issues": "${issue_tracker}"
   },
   "license": "${license}",
   "icon": "${icon}",
-  "environment": "client",
+  "environment": "*",
   "entrypoints": {
     "main": [
       "${group}.${id}.fabric.FabricEntry"

@@ -1,4 +1,8 @@
 @file:Suppress("UnstableApiUsage")
+@file:OptIn(StonecutterExperimentalAPI::class)
+
+import dev.kikugie.stonecutter.StonecutterExperimentalAPI
+
 
 plugins {
     id("net.fabricmc.fabric-loom")
@@ -6,13 +10,18 @@ plugins {
     id("maven-publish")
 }
 
+stonecutter {
+    val (version, loader) = current.project.split('-', limit = 2)
+    properties.tags(version, loader)
+}
+
 val minecraft = stonecutter.current.version
 val mcVersion = stonecutter.current.project.substringBeforeLast('-')
-val accessWidenerFilepath = "src/main/resources/${property("mod.id")}.classtweaker"
+val classTweakerFilepath = "src/main/resources/${sc.properties.get<String>("mod.id")}.classtweaker"
 
-val modVer = "${property("mod.version")}+${property("deps.sodium_compiled_against")}-mc${property("deps.minecraft")}-fabric"
-version = modVer
-base.archivesName = property("mod.id") as String
+val rawModVersion: String = sc.properties["mod.version"]
+version = "$rawModVersion+${sc.properties.get<String>("deps.sodium_compiled_against")}-mc${sc.properties.get<String>("deps.minecraft")}-fabric"
+base.archivesName = sc.properties.get<String>("mod.id")
 
 repositories {
     mavenLocal()
@@ -41,15 +50,15 @@ repositories {
 }
 
 dependencies {
-    minecraft("com.mojang:minecraft:${property("deps.minecraft")}")
-    implementation("net.fabricmc:fabric-loader:${property("deps.fabric-loader")}")
-    implementation("net.fabricmc.fabric-api:fabric-api:${property("deps.fabric-api")}")
+    minecraft("com.mojang:minecraft:${sc.properties.get<String>("deps.minecraft")}")
+    implementation("net.fabricmc:fabric-loader:${sc.properties.get<String>("deps.fabric-loader")}")
+    implementation("net.fabricmc.fabric-api:fabric-api:${sc.properties.get<String>("deps.fabric-api")}")
 
     // Mod Menu
     if (hasProperty("deps.modmenu")) {
-        api("com.terraformersmc:modmenu:${property("deps.modmenu")}")
+        api("com.terraformersmc:modmenu:${sc.properties.get<String>("deps.modmenu")}")
     } else {
-        compileOnly("com.terraformersmc:modmenu:18.0.0-alpha.3")
+        compileOnly("com.terraformersmc:modmenu:18.0.0-alpha.8")
     }
 
     // Sodium
@@ -59,12 +68,9 @@ dependencies {
     compileOnly("maven.modrinth:iris:${property("deps.iris")}-fabric")
 }
 
-stonecutter {
-}
-
 loom {
-    if(project.file(accessWidenerFilepath).exists()) {
-        accessWidenerPath = project.file(accessWidenerFilepath)
+    if(project.file(classTweakerFilepath).exists()) {
+        accessWidenerPath = project.file(classTweakerFilepath)
     }
 
     runConfigs.all {
@@ -75,20 +81,21 @@ loom {
 
 configurations.all {
     resolutionStrategy {
-        force("net.fabricmc:fabric-loader:${property("deps.fabric-loader")}")
+        force("net.fabricmc:fabric-loader:${sc.properties.get<String>("deps.fabric-loader")}")
     }
 }
 
 tasks.named<ProcessResources>("processResources") {
-    fun prop(name: String) = project.property(name) as String
+    fun prop(name: String): String = sc.properties[name]
 
     val props = HashMap<String, String>().apply {
-        this["version"] = modVer
+        this["version"] = prop("mod.version") + "+" + prop("deps.minecraft")
         this["minecraft"] = prop("dep_str.minecraft")
         this["id"] = prop("mod.id")
         this["group"] = prop("mod.group")
         this["description"] = prop("mod.description")
         this["name"] = prop("mod.name")
+        this["website_url"] = prop("mod.website_url")
         this["source_url"] = prop("mod.source_url")
         this["issue_tracker"] = prop("mod.issue_tracker")
         this["icon"] = prop("mod.icon")
@@ -99,7 +106,7 @@ tasks.named<ProcessResources>("processResources") {
         this["java_ver"] = java.targetCompatibility.majorVersion
     }
 
-    if(project.file(accessWidenerFilepath).exists()) {
+    if(project.file(classTweakerFilepath).exists()) {
         props["accesswidener_field"] = "\"accessWidener\": \"${prop("mod.id")}.classtweaker\","
     } else {
         props["accesswidener_field"] = ""
@@ -122,7 +129,7 @@ tasks {
     register<Copy>("buildAndCollect") {
         group = "build"
         from(jar.map { it.archiveFile })
-        into(rootProject.layout.buildDirectory.file("libs/${project.property("mod.version")}"))
+        into(rootProject.layout.buildDirectory.file("libs/${rawModVersion}"))
         dependsOn("build")
     }
 }
@@ -147,8 +154,8 @@ publishMods {
 
     // one of BETA, ALPHA, STABLE
     type = STABLE
-    displayName = "[Fabric] v${property("mod.version")} for mc ${stonecutter.current.version}"
-    version = modVer
+    displayName = "[Fabric] v${rawModVersion} for mc ${sc.properties.get<String>("deps.minecraft")}"
+    version = project.version.toString()
     changelog = provider { rootProject.file("CHANGELOG.md").readText() }
     modLoaders.add("fabric")
 
@@ -156,24 +163,25 @@ publishMods {
 
     if(hasProperty("publish.modrinth")) {
         modrinth {
-            projectId = property("publish.modrinth") as String
+            projectId = sc.properties.get<String>("publish.modrinth")
             accessToken = env.MODRINTH_API_KEY.orNull()
-            minecraftVersions.add(property("deps.minecraft").toString())
+            minecraftVersions.add(sc.properties.get<String>("deps.minecraft"))
             minecraftVersions.addAll(additionalVersions)
             requires("fabric-api")
-            requires("sodium")
             optional("modmenu")
+            environment = CLIENT_ONLY
         }
     }
 
     if(hasProperty("publish.curseforge")) {
         curseforge {
-            projectId = property("publish.curseforge") as String
+            projectId = sc.properties.get<String>("publish.curseforge") as String
             accessToken = env.CURSEFORGE_API_KEY.orNull()
             minecraftVersions.add(stonecutter.current.version)
             minecraftVersions.addAll(additionalVersions)
             requires("fabric-api")
-            requires("sodium")
+            client = true
+            server = false
         }
     }
 }
@@ -187,5 +195,5 @@ fun boolProperty(key: String) : Boolean {
     if(!hasProperty(key)){
         return false
     }
-    return bool(property(key).toString())
+    return bool(sc.properties.get<String>(key))
 }

@@ -1,4 +1,8 @@
 @file:Suppress("UnstableApiUsage")
+@file:OptIn(StonecutterExperimentalAPI::class)
+
+import dev.kikugie.stonecutter.StonecutterExperimentalAPI
+
 
 plugins {
     id("net.neoforged.moddev")
@@ -6,12 +10,17 @@ plugins {
     id("maven-publish")
 }
 
+stonecutter {
+    val (version, loader) = current.project.split('-', limit = 2)
+    properties.tags(version, loader)
+}
+
 val minecraft = stonecutter.current.version
 val mcVersion = stonecutter.current.project.substringBeforeLast('-')
 
-val modVer = "${property("mod.version")}+${property("deps.sodium_compiled_against")}-mc${property("deps.minecraft")}-neoforge"
-version = modVer
-base.archivesName = property("mod.id") as String
+val rawModVersion: String = sc.properties["mod.version"]
+version = "$rawModVersion+${sc.properties.get<String>("deps.sodium_compiled_against")}-mc${sc.properties.get<String>("deps.minecraft")}-neoforge"
+base.archivesName = sc.properties.get<String>("mod.id")
 
 repositories {
     mavenLocal()
@@ -62,15 +71,12 @@ dependencies {
     compileOnly("maven.modrinth:iris:${property("deps.iris")}-neoforge")
 }
 
-stonecutter {
-}
-
 neoForge {
-    version = property("deps.neoforge") as String
+    version = sc.properties.get<String>("deps.neoforge")
     validateAccessTransformers = true
 
     if (hasProperty("deps.parchment")) parchment {
-        val (mc, ver) = (property("deps.parchment") as String).split(':')
+        val (mc, ver) = sc.properties.get<String>("deps.parchment").split(':')
         mappingsVersion = ver
         minecraftVersion = mc
     }
@@ -87,7 +93,7 @@ neoForge {
     }
 
     mods {
-        register(property("mod.id") as String) {
+        register(sc.properties.get<String>("mod.id")) {
             sourceSet(sourceSets["main"])
         }
     }
@@ -95,23 +101,29 @@ neoForge {
 }
 
 tasks.named<ProcessResources>("processResources") {
-    fun prop(name: String) = project.property(name) as String
+    fun prop(name: String): String = sc.properties[name]
+
+    val neoforgeIconProperty = if(stonecutter.eval(stonecutter.current.version, ">=26.2")) {
+        "iconFile"
+    } else {
+        "logoFile"
+    }
 
     val props = HashMap<String, String>().apply {
-        this["version"] = modVer
+        this["version"] = prop("mod.version") + "+" + prop("deps.minecraft")
         this["minecraft"] = prop("dep_str.minecraft")
         this["id"] = prop("mod.id")
         this["group"] = prop("mod.group")
         this["description"] = prop("mod.description")
         this["name"] = prop("mod.name")
+        this["website_url"] = prop("mod.website_url")
         this["source_url"] = prop("mod.source_url")
         this["issue_tracker"] = prop("mod.issue_tracker")
         this["icon"] = prop("mod.icon")
         this["license"] = prop("mod.license")
-        this["fabric_loader_dep_str"] = prop("dep_str.fabric-loader")
-        this["fabric_api_dep_str"] = prop("dep_str.fabric-api")
         this["sodium_dep_str"] = prop("dep_str.sodium")
         this["java_ver"] = java.targetCompatibility.majorVersion
+        this["neo_icon_property"] = neoforgeIconProperty
     }
 
     filesMatching(listOf("fabric.mod.json", "META-INF/neoforge.mods.toml", "META-INF/mods.toml", "*.mixins.json")) {
@@ -121,7 +133,7 @@ tasks.named<ProcessResources>("processResources") {
 
 tasks {
     processResources {
-        exclude("**/fabric.mod.json", "**/*.accesswidener")
+        exclude("**/fabric.mod.json", "**/*.accesswidener", "**/*.classtweaker")
     }
 
     named("createMinecraftArtifacts") {
@@ -131,7 +143,7 @@ tasks {
     register<Copy>("buildAndCollect") {
         group = "build"
         from(jar.map { it.archiveFile })
-        into(rootProject.layout.buildDirectory.file("libs/${project.property("mod.version")}"))
+        into(rootProject.layout.buildDirectory.file("libs/${rawModVersion}"))
         dependsOn("build")
     }
 }
@@ -162,8 +174,8 @@ publishMods {
 
     // one of BETA, ALPHA, STABLE
     type = STABLE
-    displayName = "[NF] v${property("mod.version")} for mc ${stonecutter.current.version}"
-    version = modVer
+    displayName = "[NF] v${rawModVersion} for mc ${sc.properties.get<String>("deps.minecraft")}"
+    version = project.version.toString()
     changelog = provider { rootProject.file("CHANGELOG.md").readText() }
     modLoaders.add("neoforge")
 
@@ -171,25 +183,27 @@ publishMods {
 
     if (hasProperty("publish.modrinth")) {
         modrinth {
-            projectId = property("publish.modrinth") as String
+            projectId = sc.properties.get<String>("publish.modrinth") as String
             accessToken = env.MODRINTH_API_KEY.orNull()
-            minecraftVersions.add(property("deps.minecraft").toString())
+            minecraftVersions.add(sc.properties.get<String>("deps.minecraft"))
             minecraftVersions.addAll(additionalVersions)
+            environment = CLIENT_ONLY
             requires("sodium")
         }
     }
 
     if (hasProperty("publish.curseforge")) {
         curseforge {
-            projectId = property("publish.curseforge") as String
+            projectId = sc.properties.get<String>("publish.curseforge") as String
             accessToken = env.CURSEFORGE_API_KEY.orNull()
             minecraftVersions.add(stonecutter.current.version)
             minecraftVersions.addAll(additionalVersions)
+            client = true
+            server = false
             requires("sodium")
         }
     }
 }
-
 
 
 fun bool(str: String) : Boolean {
