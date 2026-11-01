@@ -26,6 +26,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.SpriteIconButton;
 import net.minecraft.client.gui.components.tabs.TabManager;
 import net.minecraft.client.gui.components.tabs.TabNavigationBar;
@@ -43,11 +44,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
-import net.minecraft.util.Util;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -56,6 +57,11 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
     private static final Component DONATION_BUTTON_TEXT = Component.translatable("sodium.options.buttons.donate");
     protected static final int FOOTER_BUTTON_WIDTH = 98;
     protected static final int ICON_BUTTON_SIZE = Button.DEFAULT_HEIGHT;
+
+    private static final Component SEARCH_HINT = Component.translatable("gui.game_rule.search").withStyle(EditBox.SEARCH_HINT_STYLE);
+    private static final int SEARCH_BOX_OFFSET = -3;
+    private static final int SEARCH_BOX_PADDING = 2;
+    private static final int SEARCH_BOX_HEIGHT = 15;
 
     private static final int TOOLTIP_WIDTH = 320;
     private static final int TOOLTIP_PADDING = 4;
@@ -86,7 +92,12 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
     protected @Nullable AbstractWidget donateButton;
     protected @Nullable AbstractWidget shaderpacksButton;
 
+    protected @Nullable EditBox searchBox;
+
     protected final ArrayList<OptionWidget<?>> optionWidgets = new ArrayList<>();
+
+    protected final ArrayList<WidgetAndPosition> searchableWidgets = new ArrayList<>();
+    protected @Nullable List<WidgetAndPosition> filteredWidgets = new ArrayList<>();
 
     @Nullable protected TooltipState tooltipState = null;
     protected final RefreshState refreshState;
@@ -141,6 +152,12 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
         catch (Exception e) {
             ScreenUtil.setScreen(this.minecraft, createErrorScreen(e, this.parent));
         }
+
+
+        this.searchBox = this.addRenderableWidget(new EditBox(this.font, 200, SEARCH_BOX_HEIGHT, Component.empty()));
+        this.searchBox.setPosition((this.width / 2) - (this.searchBox.getWidth() / 2), layout.getHeaderHeight() - SEARCH_BOX_PADDING + SEARCH_BOX_OFFSET);
+        this.searchBox.setHint(SEARCH_HINT);
+        this.searchBox.setResponder(this::performSearch);
     }
 
     protected void createTabsLayout() {
@@ -270,10 +287,12 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
             if(page instanceof ExternalPage(
                 Component name, Consumer<Screen> currentScreenConsumer
             )) {
-                optionsList.addBigOption(
-                    Button.builder(ComponentUtil.appendEllipsis(name), button -> currentScreenConsumer.accept(this)).build(),
+                AbstractWidget button = Button.builder(ComponentUtil.appendEllipsis(name), _ -> currentScreenConsumer.accept(this)).build();
+                var pos = optionsList.addBigOption(
+                    button,
                     modInfo
                 );
+                this.searchableWidgets.add(new WidgetAndPosition(button, optionsList, pos));
             }
             else if(page instanceof OptionPage optionPage) {
                 AtomicInteger totalOptions = new AtomicInteger();
@@ -318,9 +337,9 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
         }).build();
 
         if(collapsedInfo.onlyPageCollapsed()) {
-            optionsList.addBigOption(subPageButton, modInfo);
+            this.searchableWidgets.add(new WidgetAndPosition(subPageButton, optionsList, optionsList.addBigOption(subPageButton, modInfo)));
         } else {
-            optionsList.addOption(subPageButton, modInfo);
+            this.searchableWidgets.add(new WidgetAndPosition(subPageButton, optionsList, optionsList.addOption(subPageButton, modInfo)));
         }
     }
 
@@ -331,7 +350,8 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
             }
             var groupOptions = group.options();
             for (Option option : groupOptions) {
-                optionsList.addOption(buildOptionWidget(option), modInfo);
+                AbstractWidget widget = buildOptionWidget(option);
+                this.searchableWidgets.add(new WidgetAndPosition(widget, optionsList, optionsList.addOption(widget, modInfo)));
             }
         }
     }
@@ -416,6 +436,7 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
     protected void refreshOptionWidgetValues() {
         this.optionWidgets.forEach(OptionWidget::refreshValue);
         this.updateFooterButtonState();
+        this.updateFilteredOptionAlpha();
     }
 
     protected void refreshOptionWidgetVisuals() {
@@ -584,6 +605,42 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
         this.refreshOptionWidgetVisuals();
     }
 
+    protected void performSearch(String query) {
+        List<WidgetAndPosition> containedInQuery = new ArrayList<>();
+
+        if(query.isEmpty()) {
+            this.filteredWidgets = null;
+            this.updateFilteredOptionAlpha();
+            return;
+        }
+
+        String lowercaseQuery = query.toLowerCase(Locale.ROOT);
+
+        for (WidgetAndPosition widgetAndPosition : this.searchableWidgets) {
+            if(widgetAndPosition.widget().getMessage().getString().toLowerCase(Locale.ROOT).contains(lowercaseQuery)) {
+                containedInQuery.add(widgetAndPosition);
+            }
+        }
+
+        this.filteredWidgets = containedInQuery;
+        this.updateFilteredOptionAlpha();
+    }
+
+    protected void updateFilteredOptionAlpha() {
+        for (WidgetAndPosition widgetAndPosition : this.searchableWidgets) {
+            boolean visible = this.filteredWidgets == null || this.filteredWidgets.contains(widgetAndPosition);
+            widgetAndPosition.optionList.setWidgetAlpha(widgetAndPosition.position, visible ? 1f : ConfigOptions.FILTERED_OPTION_OPACITY.getValue() / 100f);
+        }
+
+        if(this.optionsList != null) {
+            this.optionsList.repositionElements();
+        }
+        for (OptionListTab tab : this.modTabs) {
+            tab.getOptionsList().repositionElements();
+        }
+    }
+
+
     public static Screen createErrorScreen(@Nullable Exception e, Screen parent) {
         final String baseKey = "gui.enchanted_sodium_options.error_screen.body.";
         MutableComponent body = Component.empty().append(Component.translatable(baseKey + "1"));
@@ -639,5 +696,8 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
     }
 
     protected record TooltipState(TooltipContent content, ScreenRectangle widgetRectangle) {
+    }
+
+    protected record WidgetAndPosition(AbstractWidget widget, VideoOptionsList optionList, VideoOptionsList.WidgetPosition position) {
     }
 }

@@ -1,5 +1,6 @@
 package games.enchanted.enchanteds_sodium_options.common.gui.widget.scroll;
 
+import games.enchanted.enchanteds_sodium_options.common.Logging;
 import games.enchanted.enchanteds_sodium_options.common.config.ConfigOptions;
 import games.enchanted.enchanteds_sodium_options.common.util.ComponentUtil;
 import net.caffeinemc.mods.sodium.client.gui.ColorTheme;
@@ -98,6 +99,20 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
         if(this.children().isEmpty()) return;
         if(this.children().getLast() instanceof OptionEntry entry && !entry.id.equals(info.id())) {
             entry.lastInCategory = true;
+        }
+    }
+
+
+    public void setWidgetAlpha(WidgetPosition position, float alpha) {
+        Entry entry = this.children().get(position.entryIndex());
+        if(!(entry instanceof OptionEntry optionEntry)) {
+            Logging.warn("Cannot set alpha of non-option widget");
+            return;
+        }
+        if(position.secondary() && optionEntry.secondChild != null) {
+            optionEntry.secondChild.setAlpha(alpha);
+        } else {
+            optionEntry.child.setAlpha(alpha);
         }
     }
 

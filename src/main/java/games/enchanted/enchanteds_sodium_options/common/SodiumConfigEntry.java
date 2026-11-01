@@ -62,6 +62,7 @@ public class SodiumConfigEntry implements ConfigEntryPoint {
                 ConfigOptions.USE_TABS.getConfigId()
             )
         );
+        group.addOption(ConfigOptions.FILTERED_OPTION_OPACITY.createSodiumOption(builder, group));
         return group;
     }
 

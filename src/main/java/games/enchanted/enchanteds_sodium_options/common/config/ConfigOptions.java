@@ -55,6 +55,13 @@ public class ConfigOptions {
         "show_mod_versions"
     ));
 
+    public static final ConfigOption<Integer> FILTERED_OPTION_OPACITY = registerOption(new IntOption(
+        40,
+        40,
+        new Range(15, 70, 1),
+        "filtered_option_visibility"
+    ));
+
     // behaviour
     public static final ConfigOption<Boolean> USE_TABS = registerOption(new BoolOption(
         true,
