@@ -15,7 +15,7 @@
   "gui.enchanted_sodium_options.option.coloured_tab_underlines": "Coloured Tab Underline",
   "gui.enchanted_sodium_options.option.coloured_tab_underlines.tooltip": "When enabled, mod accent colours will be used for the underline of tab buttons.",
   "gui.enchanted_sodium_options.option.filtered_option_visibility": "Filtered Option Visibility",
-  "gui.enchanted_sodium_options.option.filtered_option_visibility.tooltip": "How translucent options are when excluded from search results.",
+  "gui.enchanted_sodium_options.option.filtered_option_visibility.tooltip": "How opaque options are when excluded from search results.",
 
   "gui.enchanted_sodium_options.group.behaviour": "Layout",
   "gui.enchanted_sodium_options.option.use_tabs": "Use Tab Layout",
