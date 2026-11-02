@@ -24,10 +24,7 @@ import net.caffeinemc.mods.sodium.client.gui.VideoSettingsScreen;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.SpriteIconButton;
+import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.components.tabs.TabManager;
 import net.minecraft.client.gui.components.tabs.TabNavigationBar;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
@@ -58,9 +55,11 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
     protected static final int FOOTER_BUTTON_WIDTH = 98;
     protected static final int ICON_BUTTON_SIZE = Button.DEFAULT_HEIGHT;
 
+    public static final int TABS_LAYOUT_OPTION_LIST_TOP_MARGIN = 21;
+
     private static final Component SEARCH_HINT = Component.translatable("gui.game_rule.search").withStyle(EditBox.SEARCH_HINT_STYLE);
-    private static final int SEARCH_BOX_OFFSET = -3;
-    private static final int SEARCH_BOX_PADDING = 2;
+    private static final int SEARCH_BOX_Y_TABS_LAYOUT = 2;
+    private static final int SEARCH_BOX_Y_COLUMN_LAYOUT = -19;
     private static final int SEARCH_BOX_HEIGHT = 15;
 
     private static final int TOOLTIP_WIDTH = 320;
@@ -152,41 +151,57 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
         catch (Exception e) {
             ScreenUtil.setScreen(this.minecraft, createErrorScreen(e, this.parent));
         }
-
-
-        this.searchBox = this.addRenderableWidget(new EditBox(this.font, 200, SEARCH_BOX_HEIGHT, Component.empty()));
-        this.searchBox.setPosition((this.width / 2) - (this.searchBox.getWidth() / 2), layout.getHeaderHeight() - SEARCH_BOX_PADDING + SEARCH_BOX_OFFSET);
-        this.searchBox.setHint(SEARCH_HINT);
-        this.searchBox.setResponder(this::performSearch);
     }
 
     protected void createTabsLayout() {
         this.buildSodiumOptionWidgets();
 
+        this.createSearchBox();
+
         this.tabNavigationBar = new OptionListTabBar(this.width, this.tabManager, List.copyOf(this.modTabs));
         this.addRenderableWidget(this.tabNavigationBar);
         this.tabNavigationBar.selectTab(0, false);
 
+        this.addSearchBoxRenderable();
         this.createDonateAndShaderWidgets();
         this.createFooterWidgets();
     }
 
     protected void createSingleColumnLayout() {
-        this.layout.addTitleHeader(this.title, this.font);
+        LinearLayout header = this.layout.addToHeader(LinearLayout.vertical().spacing(4));
+        header.defaultCellSetting().alignHorizontallyCenter().paddingBottom(17);
+        header.addChild(new StringWidget(this.title, this.font));
+
         int headerHeight = this.layout.getHeaderHeight();
 
-        this.createDonateAndShaderWidgets();
-        this.createFooterWidgets();
+        this.createSearchBox();
 
         this.optionsList = new VideoOptionsList(
             0,
             headerHeight,
             this.width,
-            this.height - headerHeight - this.layout.getFooterHeight()
+            this.height - headerHeight - this.layout.getFooterHeight(),
+            0
         );
         this.addRenderableWidget(this.optionsList);
 
         this.buildSodiumOptionWidgets();
+
+        this.addSearchBoxRenderable();
+        this.createDonateAndShaderWidgets();
+        this.createFooterWidgets();
+    }
+
+    protected void createSearchBox() {
+        this.searchBox = new EditBox(this.font, 200, SEARCH_BOX_HEIGHT, Component.empty());
+        this.searchBox.setHint(SEARCH_HINT);
+        this.searchBox.setResponder(this::performSearch);
+        this.addWidget(this.searchBox);
+    }
+
+    protected void addSearchBoxRenderable() {
+        if(this.searchBox == null) return;
+        this.addRenderableOnly(this.searchBox);
     }
 
     protected void createDonateAndShaderWidgets() {
@@ -587,7 +602,7 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
             this.tabManager.setTabArea(tabArea);
         }
 
-        if(optionsList != null) {
+        if(this.optionsList != null) {
             this.optionsList.setRectangle(
                 this.width,
                 this.height - headerHeight - this.layout.getFooterHeight(),
@@ -600,6 +615,13 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
                 this.optionsList.setScrollAmount(this.initialScrollAmount);
                 this.initialScrollAmount = 0.0d;
             }
+        }
+
+        if(this.searchBox != null) {
+            this.searchBox.setPosition(
+                (this.width / 2) - (this.searchBox.getWidth() / 2),
+                this.layout.getHeaderHeight() + (ConfigOptions.USE_TABS.getValue() ? SEARCH_BOX_Y_TABS_LAYOUT : SEARCH_BOX_Y_COLUMN_LAYOUT)
+            );
         }
 
         this.refreshOptionWidgetVisuals();

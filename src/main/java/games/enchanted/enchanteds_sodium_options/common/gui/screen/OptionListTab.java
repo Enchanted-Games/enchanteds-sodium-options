@@ -18,7 +18,7 @@ public class OptionListTab implements Tab {
 
     public OptionListTab(Component title, VideoOptionsList.ModInfo modInfo) {
         this.title = title;
-        this.optionsList = new VideoOptionsList(0, 0, 0, 0);
+        this.optionsList = new VideoOptionsList(0, 0, 0, 0, EnchantedSodiumOptionsScreen.TABS_LAYOUT_OPTION_LIST_TOP_MARGIN);
         this.modInfo = modInfo;
         this.layout = LinearLayout.horizontal();
     }
@@ -40,7 +40,12 @@ public class OptionListTab implements Tab {
 
     @Override
     public void doLayout(ScreenRectangle screenRectangle) {
-        this.optionsList.setRectangle(screenRectangle.width(), screenRectangle.height(), screenRectangle.left(), screenRectangle.top());
+        this.optionsList.setRectangle(
+            screenRectangle.width(),
+            screenRectangle.height() - EnchantedSodiumOptionsScreen.TABS_LAYOUT_OPTION_LIST_TOP_MARGIN,
+            screenRectangle.left(),
+            screenRectangle.top() + EnchantedSodiumOptionsScreen.TABS_LAYOUT_OPTION_LIST_TOP_MARGIN
+        );
         this.optionsList.repositionElements();
     }
 

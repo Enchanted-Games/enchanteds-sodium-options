@@ -1,6 +1,7 @@
 package games.enchanted.enchanteds_sodium_options.common.gui.widget.scroll;
 
 import games.enchanted.enchanteds_sodium_options.common.Logging;
+import games.enchanted.enchanteds_sodium_options.common.ModConstants;
 import games.enchanted.enchanteds_sodium_options.common.config.ConfigOptions;
 import games.enchanted.enchanteds_sodium_options.common.util.ComponentUtil;
 import net.caffeinemc.mods.sodium.client.gui.ColorTheme;
@@ -23,10 +24,15 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptionsList.Entry> {
+    public static final Identifier INWORLD_PADDING_SEPARATOR = Identifier.fromNamespaceAndPath(ModConstants.MOD_ID, "textures/gui/inworld_padding_separator.png");
+    public static final Identifier PADDING_SEPARATOR = Identifier.fromNamespaceAndPath(ModConstants.MOD_ID, "textures/gui/padding_separator.png");
+
     public static final Identifier LIST_BACKGROUND = Identifier.withDefaultNamespace("textures/gui/menu_list_background.png");
     public static final Identifier INWORLD_LIST_BACKGROUND = Identifier.withDefaultNamespace("textures/gui/inworld_menu_list_background.png");
+
     public static final Identifier MENU_BACKGROUND = Identifier.withDefaultNamespace("textures/gui/menu_background.png");
     private static final Identifier INWORLD_MENU_BACKGROUND = Identifier.withDefaultNamespace("textures/gui/inworld_menu_background.png");
+
     public static final int LIST_BACKGROUND_TEXTURE_SIZE = 32;
     public static final int MENU_BACKGROUND_TEXTURE_SIZE = 16;
 
@@ -34,11 +40,14 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
     public static final int DEFAULT_CHILD_WIDTH = 150;
     public static final int ROW_WIDTH = 310;
 
+    protected final int topPadding;
+
     private final ArrayList<ModTitlePosition> modCategoryTitlePositions = new ArrayList<>();
     @Nullable private OptionEntry lastEntry = null;
 
-    public VideoOptionsList(int x, int y, int width, int height) {
+    public VideoOptionsList(int x, int y, int width, int height, int topPadding) {
         super(x, y, width, height);
+        this.topPadding = topPadding;
     }
 
     @Override
@@ -145,16 +154,17 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
     protected void renderBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
         boolean notInWorld = Minecraft.getInstance().level == null;
         boolean useTabs = ConfigOptions.USE_TABS.getValue();
+        int paddedY = this.getY() - this.topPadding;
 
         graphics.blit(
             RenderPipelines.GUI_TEXTURED,
             notInWorld ? (useTabs ? MENU_BACKGROUND : LIST_BACKGROUND) : (useTabs ? INWORLD_MENU_BACKGROUND : INWORLD_LIST_BACKGROUND),
             this.getX(),
-            this.getY(),
+            paddedY,
             this.getRight(),
             this.getBottom() + (int)this.scrollAmount(),
             this.getWidth(),
-            this.getHeight(),
+            this.getHeight() + this.topPadding,
             useTabs ? MENU_BACKGROUND_TEXTURE_SIZE : LIST_BACKGROUND_TEXTURE_SIZE,
             useTabs ? MENU_BACKGROUND_TEXTURE_SIZE : LIST_BACKGROUND_TEXTURE_SIZE
         );
@@ -162,6 +172,8 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
         int separatorTextureWidth = 32;
         int separatorTextureHeight = 2;
         int separatorHeight = 2;
+        int paddingSeparatorTextureHeight = 1;
+        int paddingSeparatorHeight = 1;
 
         if(!useTabs) {
             Identifier headerSeparator = notInWorld ? Screen.HEADER_SEPARATOR : Screen.INWORLD_HEADER_SEPARATOR;
@@ -169,13 +181,29 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
                 RenderPipelines.GUI_TEXTURED,
                 headerSeparator,
                 this.getX(),
-                this.getY() - 2,
+                paddedY - 2,
                 0.0F,
                 0.0F,
                 this.getWidth(),
                 separatorTextureHeight,
                 separatorTextureWidth,
                 separatorHeight
+            );
+        }
+
+        if(this.topPadding > 0) {
+            Identifier paddingSeparator = notInWorld ? PADDING_SEPARATOR : INWORLD_PADDING_SEPARATOR;
+            graphics.blit(
+                RenderPipelines.GUI_TEXTURED,
+                paddingSeparator,
+                this.getX(),
+                this.getY() - 1,
+                0.0F,
+                0.0F,
+                this.getWidth(),
+                paddingSeparatorTextureHeight,
+                separatorTextureWidth,
+                paddingSeparatorHeight
             );
         }
 

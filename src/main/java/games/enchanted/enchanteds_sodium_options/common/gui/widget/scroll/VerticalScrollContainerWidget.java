@@ -104,15 +104,15 @@ public abstract class VerticalScrollContainerWidget<C extends VerticalScrollCont
     }
 
     @Override
-    protected void extractWidgetRenderState(GuiGraphicsExtractor GuiGraphicsExtractor, int mouseX, int mouseY, float partialTick) {
+    protected void extractWidgetRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
         this.hoveredChild = this.isMouseOver(mouseX, mouseY) ? this.getChildAtPosition(mouseX, mouseY) : null;
-        this.renderBackground(GuiGraphicsExtractor, mouseX, mouseY, partialTick);
-        this.enableScissor(GuiGraphicsExtractor);
-        this.renderChildren(GuiGraphicsExtractor, mouseX, mouseY, partialTick);
-        GuiGraphicsExtractor.disableScissor();
-        this.extractScrollbar(GuiGraphicsExtractor, mouseX, mouseY);
+        this.renderBackground(graphics, mouseX, mouseY, partialTick);
+        this.enableScissor(graphics);
+        this.renderChildren(graphics, mouseX, mouseY, partialTick);
+        graphics.disableScissor();
+        this.extractScrollbar(graphics, mouseX, mouseY);
         if(InputUtil.shouldShowDebugWidgetBound()) {
-            GuiGraphicsExtractor.outline(this.getX(), this.getY(), this.width, this.height, 0xff9f7252);
+            graphics.outline(this.getX(), this.getY(), this.width, this.height, 0xff9f7252);
         }
     }
 
