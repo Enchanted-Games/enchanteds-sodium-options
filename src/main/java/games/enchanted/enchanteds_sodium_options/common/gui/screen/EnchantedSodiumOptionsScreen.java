@@ -79,6 +79,10 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
     protected final Screen parent;
     protected double initialScrollAmount;
 
+    protected final int initialTabIndex;
+    protected final String initialSearchContent;
+    protected boolean initialSetupDone = false;
+
     public final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
     protected @Nullable VideoOptionsList optionsList;
     protected List<OptionListTab> modTabs = new ArrayList<>();
@@ -115,14 +119,19 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
     @Nullable protected TooltipState tooltipState = null;
     protected final RefreshState refreshState;
 
-    protected EnchantedSodiumOptionsScreen(Screen parent, Component title, double initialScrollAmount) {
+    protected EnchantedSodiumOptionsScreen(Screen parent, Component title, double initialScrollAmount, int tabIndex, String searchContent) {
         super(title);
         this.parent = parent;
         this.initialScrollAmount = initialScrollAmount;
         this.refreshState = new RefreshState(RefreshState.createInitialValuesMap(REFRESH_SCREEN_OPTIONS));
+        this.initialTabIndex = tabIndex;
+        this.initialSearchContent = searchContent;
     }
-    protected EnchantedSodiumOptionsScreen(Screen parent, double initialScrollAmount) {
-        this(parent, TITLE, initialScrollAmount);
+    protected EnchantedSodiumOptionsScreen(Screen parent, double initialScrollAmount, int tabIndex, String searchContent) {
+        this(parent, TITLE, initialScrollAmount, tabIndex, searchContent);
+    }
+    protected EnchantedSodiumOptionsScreen(Screen parent, Component title) {
+        this(parent, title, 0d, -1, "");
     }
 
     public static Screen createSodiumScreen(Screen parent) {
@@ -133,12 +142,12 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
     }
 
     public static Screen create(Screen parent) {
-        return create(parent, 0.0d);
+        return create(parent, 0.0d, -1, "");
     }
 
-    public static Screen create(Screen parent, double initialScrollAmount) {
+    public static Screen create(Screen parent, double initialScrollAmount, int tabIndex, String searchContent) {
         try {
-            Screen screen = new EnchantedSodiumOptionsScreen(parent, initialScrollAmount);
+            Screen screen = new EnchantedSodiumOptionsScreen(parent, initialScrollAmount, tabIndex, searchContent);
             ConfigManager.CONFIG.resetAllOptionsFromBindings();
             return screen;
         } catch (Exception e) {
@@ -161,9 +170,21 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
 
             this.updateFooterButtonState();
             this.repositionElements();
+            this.initialSetup();
         }
         catch (Exception e) {
             ScreenUtil.setScreen(this.minecraft, createErrorScreen(e, this.parent));
+        }
+    }
+
+    protected void initialSetup() {
+        if(this.initialSetupDone) return;
+        if(this.searchBox != null) {
+            this.searchBox.setValue(this.initialSearchContent);
+//            this.performSearch(this.initialSearchContent);
+        }
+        if(this.tabNavigationBar != null && this.initialTabIndex >= 0) {
+            this.tabNavigationBar.selectTab(this.initialTabIndex, false);
         }
     }
 
@@ -450,11 +471,18 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
     private void saveChanges() {
         ConfigManager.CONFIG.applyAllOptions();
         if(this.refreshState.anyChanged(REFRESH_SCREEN_OPTIONS)) {
+            int tabIndex = -1;
+            try {
+                //noinspection SuspiciousMethodCalls
+                tabIndex = this.modTabs.indexOf(this.tabManager.getCurrentTab());
+            } catch (Exception _) {
+            }
+
             ScreenUtil.setScreen(this.minecraft, create(
-                // TODO: move searchbox content over to new screen
-                // TODO: save the currently selected tab and select it again in the new screen
                 this.getNonVideoOptionsParent(),
-                this.optionsList == null ? 0.0d : this.optionsList.scrollAmount()
+                this.optionsList == null ? 0.0d : this.optionsList.scrollAmount(),
+                tabIndex,
+                this.searchBox == null ? "" : this.searchBox.getValue()
             ));
         }
         this.refreshOptionWidgetValues();
