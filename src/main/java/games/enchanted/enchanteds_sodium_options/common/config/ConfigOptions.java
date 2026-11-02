@@ -134,7 +134,7 @@ public class ConfigOptions {
         } catch (JsonParseException e) {
             Logging.error("Failed to parse config file '{}', {}", FILE_NAME, e);
         } catch (FileNotFoundException e) {
-            Logging.info("Config file '{}' not found", FILE_NAME);
+            Logging.info("Config file '{}' not found. Creating...", FILE_NAME);
             saveConfig();
         }
 
