@@ -1,10 +1,12 @@
 package games.enchanted.enchanteds_sodium_options.common.gui.widget;
 
 import games.enchanted.enchanteds_sodium_options.common.ModConstants;
+import net.irisshaders.iris.gl.uniform.FloatSupplier;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.ARGB;
 
 public class ResetOverlay {
     public static final Identifier BUTTON_ICON_ID = Identifier.fromNamespaceAndPath(ModConstants.MOD_ID, "widget/reset_button");
@@ -14,10 +16,12 @@ public class ResetOverlay {
 
     final AbstractWidget widget;
     final Identifier icon;
+    final FloatSupplier alpha;
 
     public ResetOverlay(AbstractWidget widget, Identifier icon) {
         this.widget = widget;
         this.icon = icon;
+        this.alpha = widget::getAlpha;
     }
 
     public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
@@ -27,7 +31,8 @@ public class ResetOverlay {
             widget.getX() + widget.getWidth() - WIDTH,
             widget.getY(),
             WIDTH,
-            HEIGHT
+            HEIGHT,
+            ARGB.white(this.alpha.getAsFloat())
         );
     }
 }
