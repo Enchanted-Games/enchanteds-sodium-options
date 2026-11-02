@@ -15,6 +15,7 @@ import games.enchanted.enchanteds_sodium_options.common.gui.tooltip.TooltipRende
 import games.enchanted.enchanteds_sodium_options.common.gui.widget.option.*;
 import games.enchanted.enchanteds_sodium_options.common.gui.widget.scroll.VideoOptionsList;
 import games.enchanted.enchanteds_sodium_options.common.gui.widget.tab.OptionListTabBar;
+import games.enchanted.enchanteds_sodium_options.common.mixin.accessor.ScreenAccessor;
 import games.enchanted.enchanteds_sodium_options.common.mixin.accessor.sodium.OptionAccessor;
 import games.enchanted.enchanteds_sodium_options.common.util.ComponentUtil;
 import games.enchanted.enchanteds_sodium_options.common.util.ScreenUtil;
@@ -81,7 +82,20 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
     public final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
     protected @Nullable VideoOptionsList optionsList;
     protected List<OptionListTab> modTabs = new ArrayList<>();
-    protected final TabManager tabManager = new TabManager(this::addRenderableWidget, this::removeWidget);
+    protected final TabManager tabManager = new TabManager(
+        widget -> {
+            this.addRenderableWidget(widget);
+            if(this.searchBox != null) {
+                this.addRenderableOnly(this.searchBox);
+            }
+        },
+        widget -> {
+            this.removeWidget(widget);
+            if(this.searchBox != null) {
+                ((ScreenAccessor) this).enchanteds_sodium_options$getRenderables().remove(this.searchBox);
+            }
+        }
+    );
     protected @Nullable TabNavigationBar tabNavigationBar;
 
     protected @Nullable AbstractWidget undoButton;
@@ -313,9 +327,9 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
                 AtomicInteger totalOptions = new AtomicInteger();
                 optionPage.groups().forEach(optionGroup -> totalOptions.addAndGet(optionGroup.options().size()));
 
-                final boolean shouldCollapseThisPage = modInfo.id().equals("sodium") ? ConfigOptions.COLLAPSE_SODIUM_OPTIONS.getValue() : true;
+                boolean shouldCollapseThisPage = modInfo.id().equals("sodium") ? ConfigOptions.COLLAPSE_SODIUM_OPTIONS.getValue() : true;
 
-                if(totalOptions.get() > ConfigOptions.COLLAPSE_THRESHOLD.getValue() && shouldCollapseThisPage) {
+                if(totalOptions.get() > ConfigOptions.COLLAPSE_THRESHOLD.getValue() && shouldCollapseThisPage && !ConfigOptions.USE_TABS.getValue()) {
                     // if this page is collapsed, skip and add it later
                     collapsedOptionPages.add(optionPage);
                     continue;
@@ -437,6 +451,8 @@ public class EnchantedSodiumOptionsScreen extends Screen implements TooltipConsu
         ConfigManager.CONFIG.applyAllOptions();
         if(this.refreshState.anyChanged(REFRESH_SCREEN_OPTIONS)) {
             ScreenUtil.setScreen(this.minecraft, create(
+                // TODO: move searchbox content over to new screen
+                // TODO: save the currently selected tab and select it again in the new screen
                 this.getNonVideoOptionsParent(),
                 this.optionsList == null ? 0.0d : this.optionsList.scrollAmount()
             ));

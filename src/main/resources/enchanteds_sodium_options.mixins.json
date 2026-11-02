@@ -8,8 +8,9 @@
   "client": [
     "AbstractSliderButtonMixin",
     "AbstractWidgetMixin",
-    "accessor.sodium.OptionAccessor",
+    "accessor.ScreenAccessor",
     "accessor.TabNavigationBarAccessor",
+    "accessor.sodium.OptionAccessor",
     "sodium.VideoSettingsScreenMixin",
     "widget.TabButtonMixin",
     "widget.TabNavigationBarMixin"
