@@ -29,3 +29,11 @@ modId="sodium"
 type="required"
 versionRange="${sodium_dep_str}"
 side="CLIENT"
+
+
+[[dependencies.${id}]]
+modId="betterfpsdist"
+type="discouraged"
+reason="This mod forces the vanilla video settings screen to open instead of the Sodium one. When used in combination with Enchanted's Sodium Options this can be very unintuitive and confusing as both screens look similar."
+versionRange="[0,)"
+side="CLIENT"
