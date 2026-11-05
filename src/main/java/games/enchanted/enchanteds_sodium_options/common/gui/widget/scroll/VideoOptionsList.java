@@ -33,6 +33,11 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
     public static final Identifier MENU_BACKGROUND = Identifier.withDefaultNamespace("textures/gui/menu_background.png");
     private static final Identifier INWORLD_MENU_BACKGROUND = Identifier.withDefaultNamespace("textures/gui/inworld_menu_background.png");
 
+    public static final int MOD_TITLE_TOP_PADDING_MIN = 6;
+    public static final int MOD_TITLE_TOP_PADDING_MAX = 16;
+    public static final int CATEGORY_TITLE_TOP_PADDING_MIN = 2;
+    public static final int CATEGORY_TITLE_TOP_PADDING_MAX = 8;
+
     public static final int LIST_BACKGROUND_TEXTURE_SIZE = 32;
     public static final int MENU_BACKGROUND_TEXTURE_SIZE = 16;
 
@@ -77,19 +82,20 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
     }
 
     public void addModTitle(Component name, String version, @Nullable Identifier icon, boolean monochromeIcon, ModInfo modInfo) {
+        boolean hasBiggerTopPadding = !this.modCategoryTitlePositions.isEmpty();
         this.modCategoryTitlePositions.add(new ModTitlePosition(modInfo, this.children().size()));
         trySetLastInCategoryOnBottomEntry(modInfo);
         this.lastEntry = null;
-        this.addChild(new ModTitleEntry(name, version, icon, monochromeIcon, modInfo));
+        this.addChild(new ModTitleEntry(name, version, icon, monochromeIcon, hasBiggerTopPadding ? MOD_TITLE_TOP_PADDING_MAX : MOD_TITLE_TOP_PADDING_MIN, modInfo));
     }
 
     public void addCategoryHeader(Component header, ModInfo modInfo) {
         trySetLastInCategoryOnBottomEntry(modInfo);
         this.lastEntry = null;
-        boolean hasExtraTopPadding =
+        boolean hasLessTopPadding =
             this.children().getLast() instanceof ModTitleEntry ||
             ConfigOptions.USE_TABS.getValue() && this.children().size() == 1 && this.children().getFirst() instanceof SpacerEntry;
-        this.addChild(new CategoryHeaderEntry(header, modInfo, hasExtraTopPadding));
+        this.addChild(new CategoryHeaderEntry(header, modInfo, hasLessTopPadding ? CATEGORY_TITLE_TOP_PADDING_MIN : CATEGORY_TITLE_TOP_PADDING_MAX));
     }
 
     public void addGroupName(Component header, ModInfo modInfo) {
@@ -399,9 +405,9 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
         final int titleColour;
         final int versionColour;
 
-        ModTitleEntry(Component title, String version, @Nullable Identifier icon, boolean monochromeIcon, ModInfo info) {
+        ModTitleEntry(Component title, String version, @Nullable Identifier icon, boolean monochromeIcon, int topMargin, ModInfo info) {
             super(info);
-            setMargins(new Margin(8, 0, CategoryHeaderEntry.LEFT_TEXT_OFFSET, 0));
+            setMargins(new Margin(topMargin, 0, CategoryHeaderEntry.LEFT_TEXT_OFFSET, 0));
             this.title = title.copy().withStyle(style -> style.withBold(true));
             this.icon = icon;
             this.version = ComponentUtil.versionString(version);
@@ -453,7 +459,7 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
 
         @Override
         protected int accentTop() {
-            return super.accentTop() + Entry.ACCENT_TOPMOST_OFFSET;
+            return super.accentTop() + this.getMargins().top() - 1;
         }
     }
 
@@ -464,13 +470,13 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
         final Component title;
         final int textColour;
 
-        CategoryHeaderEntry(Component header, ModInfo info, boolean hasLessTopPadding) {
-            this(header, info, info.theme().themeLighter, hasLessTopPadding);
+        CategoryHeaderEntry(Component header, ModInfo info, int topPadding) {
+            this(header, info, info.theme().themeLighter, topPadding);
         }
 
-        CategoryHeaderEntry(Component header, ModInfo info, int textColour, boolean hasLessTopPadding) {
+        CategoryHeaderEntry(Component header, ModInfo info, int textColour, int topPadding) {
             super(info);
-            setMargins(new Margin(hasLessTopPadding ? 2 : 12, 2, LEFT_TEXT_OFFSET, 0));
+            setMargins(new Margin(topPadding, CATEGORY_TITLE_TOP_PADDING_MIN, LEFT_TEXT_OFFSET, 0));
             this.title = header.copy().withStyle(style -> style.withBold(true).withUnderlined(true));
             this.textColour = textColour;
         }
@@ -500,7 +506,7 @@ public class VideoOptionsList extends VerticalScrollContainerWidget<VideoOptions
 
     static class GroupTitleEntry extends CategoryHeaderEntry {
         GroupTitleEntry(Component header, ModInfo info) {
-            super(header, info, CommonColors.TEXT_GRAY, false);
+            super(header, info, CommonColors.TEXT_GRAY, 2);
             setMargins(new Margin(4, 0, 14, 0));
         }
 
